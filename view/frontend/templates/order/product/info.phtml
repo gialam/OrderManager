@@ -1,0 +1,410 @@
+<?php
+/**
+ * Copyright © 2015 Magenest. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @category  Magenest
+ */
+?>
+
+<?php /** @var  $block Magenest\OrderManager\Block\Product\View */ ?>
+<?php
+$_items = $block->getItemsOrder();
+$orderId = $_items->getId();
+$collections = $block->getDataProduct();
+$symbol = $_items->getOrderCurrency()->getCurrencySymbol();
+$_dataOrder = $block->getNewProduct();
+?>
+<!--<a>-->
+<!--    --><?php //echo $block->getSubtotal(); ?>
+<!--</a>-->
+<button id="show_content" style="float: right" class="primary">Add Products</button>
+
+<div class="table-wrapper collection-products" id="product_order">
+    <button id="back_content" style="float: left" class="back"
+            onclick="window.location.href='<?php echo $block->getBackUrl() ?>'">Back</button>
+    <form class="form-address-edit"  method="post" id="form-validate" enctype="multipart/form-data"
+          action="<?php echo $block->getUpdateProductUrl()?>"
+          data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button type="submit" class="action update primary" data-action="update-Data"
+                        title="<?php /* @escapeNotVerified */ echo __('Update Data') ?>">
+                    <span><?php /* @escapeNotVerified */ echo __('Update ') ?></span>
+                </button>
+            </div>
+        </div>
+    <table id="my-collection-products-table" class="data table table-collection-products">
+        <caption class="table-caption"><?php echo __('List Product') ?></caption>
+        <div>
+            <font color="red">Product Old</font> </br>
+        </div>
+        <thead>
+        <tr class="headings">
+            <th class="col-product"><span><?php /* @escapeNotVerified */ echo __('Product') ?></span></th>
+            <th class="col-price"><span><?php /* @escapeNotVerified */ echo __('Price') ?></span></th>
+            <th class="col-qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></th>
+            <th class="col-subtotal"><span><?php /* @escapeNotVerified */ echo __('Subtotal') ?></span></th>
+            <th class="col-discount"><span><?php /* @escapeNotVerified */ echo __('Discount') ?></span></th>
+            <th class="col-row-total"><span><?php /* @escapeNotVerified */ echo __('Row Subtotal') ?></span></th>
+        </tr
+        </thead>
+        <tbody>
+        <?php $i = 0 ?>
+
+        <?php foreach ($_items->getAllItems()as $_item ) { ?>
+            <?php $id_product = $_item->getProductId() ?>
+            <tr>
+                <td data-th="<?php echo $block->escapeHtml(__('Product')) ?>" class="col-product">
+                    <?php echo  $_item->getName(); ?>
+                    <div class="product-sku-block">
+                        <span><?php /* @escapeNotVerified */ echo __('SKU') ?>:</span>
+                        <?php echo $_item->getSku()?>
+                    </div>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Price')) ?>" class="col-price">
+                    <?php echo $symbol.(float)$_item->getPrice(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Qty')) ?>" class="col-qty">
+<!--                    --><?php //echo $_item->getQtyOrdered(); ?>
+                    <div class="control">
+                        <input type="number" name="quantity-<?php echo $id_product?>" id="quantity" class="input-number-quantity"
+                               style="width: 50px;" value="<?php echo $_item->getQtyOrdered(); ?>">
+                    </div>
+
+                </td>
+
+                <td data-th="<?php echo $block->escapeHtml(__('Subtotal')) ?>" class="col-subtotal">
+                    <?php echo $symbol.($_item->getPrice()) * ($_item->getQtyOrdered()); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col-discount">
+                    <?php echo $symbol.(float)$_item->getDiscountAmount(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Row Subtotal')) ?>" class="col-row-total">
+                    <?php echo $symbol.(float)$_item->getRowTotal(); ?>
+
+                </td>
+            </tr>
+        <?php } ?>
+        </tbody>
+    </table>
+    </form>
+    <table id="my-collection-products-table-new" class="data table table-collection-products-new">
+        <caption class="table-caption"><?php echo __('List Product') ?></caption>
+        <div>
+            <font color="red">Product New</font> </br>
+        </div>
+        <thead>
+        <tr class="headings">
+            <th class="col-product"><span><?php /* @escapeNotVerified */ echo __('Product') ?></span></th>
+            <th class="col-price"><span><?php /* @escapeNotVerified */ echo __('Price') ?></span></th>
+            <th class="col-qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></th>
+            <th class="col-subtotal"><span><?php /* @escapeNotVerified */ echo __('Subtotal') ?></span></th>
+            <th class="col-discount"><span><?php /* @escapeNotVerified */ echo __('Discount') ?></span></th>
+            <th class="col-row-total"><span><?php /* @escapeNotVerified */ echo __('Row Subtotal') ?></span></th>
+            <th class="col-action"><span><?php /* @escapeNotVerified */ echo __('Action') ?></span></th>
+        </tr
+        </thead>
+        <tbody>
+        <?php $i = 0 ?>
+        <?php foreach ($_dataOrder as $_data ) { ?>
+            <?php $id_product = $_data->getId() ?>
+            <tr>
+                <td data-th="<?php echo $block->escapeHtml(__('Product')) ?>" class="col-product">
+                    <?php echo  $_data->getName(); ?>
+                    <div class="product-sku-block">
+                        <span><?php /* @escapeNotVerified */ echo __('SKU') ?>:</span>
+                        <?php echo $_data->getSku()?>
+                    </div>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Price')) ?>" class="col-price">
+                    <?php echo $symbol.(float)$_data->getPrice(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Qty')) ?>" class="col-qty">
+                    <div class="control">
+                        <input type="number" name="quantity" id="quantity" class="input-number-quantity"
+                               style="width: 50px;" value="<?php echo $_data->getQuantity(); ?>">
+                    </div>
+
+                </td>
+
+                <td data-th="<?php echo $block->escapeHtml(__('Subtotal')) ?>" class="col-subtotal">
+                    <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col-discount">
+                    <?php echo $symbol.$_data->getDiscount(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Row Subtotal')) ?>" class="col-row-total">
+                    <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()); ?>
+
+                </td>
+                <td class="col-actions last">
+                    <a href="<?php echo $block->getRemoveProduct($id_product) ?>" class="action view">
+                        <span><?php /* @escapeNotVerified */ echo __('Remove') ?></span>
+                    </a>
+                </td>
+            </tr>
+        <?php } ?>
+        </tbody>
+    </table>
+
+</div>
+<!--<div id="total" align="right" style="display: none;">-->
+<!--    <font size="5" color="red">New Total</font></br>-->
+<!--    <a2 class="col-Subtotal">-->
+<!--        --><?php ///* @escapeNotVerified */ echo __('Subtotal             :').(float)$_items->getSubtotal() ?><!--</br></a2>-->
+<!--    <a3 class="col-Shipping">-->
+<!--        --><?php ///* @escapeNotVerified */ echo __('Shipping & Handling  :').(float)$_items->getBaseShippingAmount() ?><!--</br></a3>-->
+<!--    <a4 class="col-Tax">-->
+<!--        --><?php ///* @escapeNotVerified */ echo __('Tax  :').(float)$_items->getTaxAmount() ?><!--</br></a4>-->
+<!--    <a5 class="col-GrandTotal">-->
+<!--        <b>--><?php ///* @escapeNotVerified */ echo __('Grand Total        :').(float)$_items->getGrandTotal() ?><!--</b></br></a5>-->
+<!--</div>-->
+<?php if ($block->getPagerHtml()): ?>
+    <div class="products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); ?></div>
+<?php endif ?>
+
+<div id="addProduct" style="display: none">
+    <table id="sampleTbl" class="data table table-collection-products">
+        <caption class="table-caption"><?php echo __('List Product') ?></caption>
+        <thead>
+        <tr>
+            <th><?php echo __('Product Id') ?></th>
+            <th><?php echo __('Thumbnail') ?></th>
+            <th><?php echo __('Product') ?></th>
+            <th><?php echo __('SKU') ?></th>
+            <th><?php echo __('Price') ?></th>
+            <th><?php echo __('Discount') ?></th>
+            <th><?php echo __('Select') ?></th>
+            <th><?php echo __('Quantity') ?></th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($collections as $collection ) {
+            ?>
+            <tr>
+                <td data-th="<?php echo $block->escapeHtml(__('Product Id')) ?>" class="col id" name="productId_item"
+                id="productId_item">
+                    <?php echo  $collection->getId(); ?>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Thumbnail')) ?>" class="col id" name="thumbnail_item"
+                    id="thumbnail_item">
+<!--                    --><?php //echo  $collection->getThumbnail(); ?>
+                    <?php echo '<img src="http://127.0.0.1/magento/pub/media/catalog/product/'.$collection->getThumbnail().'" width="40" height="40" />';?>
+                </td>
+
+                <td data-th="<?php echo $block->escapeHtml(__('Product')) ?>" class="col product" name="name_item"
+                    id="name_item">
+                    <?php echo $collection->getName(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('SKU')) ?>" class="col sku" name="sku_item"
+                    id="sku_item">
+                    <?php echo $collection->getSku(); ?>
+
+                </td>
+
+                <td data-th="<?php echo $block->escapeHtml(__('Price')) ?>" class="col price" name="price_item"
+                    id="price_item">
+                    <?php echo (float)$collection->getPrice(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col discount" name="discount_item"
+                    id="discount_item">
+                    <?php echo (float)$collection->getDiscount(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Select')) ?>" class="col select" >
+                    <input type="checkbox" name="select" style="width: 30px;height: 30px "/>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Quantity')) ?>" class="col quantity" name="quantity_item"
+                    id="quantity_item">
+                    <div class="control">
+                        <input type="number" name="quantity" id="quantity" class="input-number-quantity"
+                               style="width: 50px;">
+                    </div>
+
+                </td>
+            </tr>
+
+        <?php } ?>
+        </tbody>
+    </table>
+    <div id="pageNavPosition" style="float: none">
+        <span onclick="pager.prev();" class="pg-normal"> « Prev </span>
+        |
+        <span id="pg1" class="pg-normal" onclick="pager.showPage(1);">1</span>
+        |
+        <span id="pg2" class="pg-normal" onclick="pager.showPage(2);">2</span>
+        |
+        <span id="pg3" class="pg-normal" onclick="pager.showPage(3);">3</span>
+        |
+        <span id="pg4" class="pg-normal" onclick="pager.showPage(4);">4</span>
+        |
+        <span id="pg5" class="pg-normal" onclick="pager.showPage(5);">5</span>
+        |
+        <span id="pg6" class="pg-selected" onclick="pager.showPage(6);">6</span>
+        |
+        <span onclick="pager.next();" class="pg-normal"> Next »</span>
+    </div>
+    </br>
+    <button id="hide_content" class="secondary">Cancel</button>
+
+    <button id="save_content" class="save data">Add Selected Product(s) to Order</button>
+</div>
+
+<!--<div class="textarea-wrap">-->
+<!--    <textarea id="tbTableValuess" name="tblValues" rows="4"></textarea>-->
+<!---->
+<!--</div>-->
+<script type="text/javascript">
+    require([
+            'jquery',
+            "underscore",
+            'Magento_Ui/js/form/form',
+            'ko',
+            'Magento_Ui/js/modal/modal'
+    ], function($) {
+
+        'use strict';
+
+        $("#show_content").click(function(){
+            $("#addProduct").show();
+            $("#product_order").hide();
+            $("#show_content").hide();update_content
+            $("#total").hide();
+
+        });
+        $("#hide_content").click(function(){
+            $("#addProduct").hide();
+            $("#product_order").show();
+            $("#show_content").show();
+            $("#total").show();
+
+        });
+        $("#save_content").click(function(){
+                var TableDatas;
+                var TableData = new Array();
+                $('#sampleTbl tr').has('input[type="checkbox"]:checked').each(function (row, tr) {
+                    TableData[row] = {
+                        "productId": $(tr).find('td:eq(0)').text()
+                        , "orderId": $(tr).find('td:eq(1)').text()
+                        , "name": $(tr).find('td:eq(2)').text()
+                        , "sku": $(tr).find('td:eq(3)').text()
+                        , "price": $(tr).find('td:eq(4)').text()
+                        , "discount": $(tr).find('td:eq(5)').text()
+                        , "quantity": $(tr).find('td:eq(7) input').val()
+                    }
+                });
+
+                TableDatas = JSON.stringify(TableData);
+//                $('#tbTableValues').val('JSON array: \n' + TableDatas.replace(/},/g, "},\n"));
+                $.ajax({
+                    type: "POST",
+                    url: '<?php echo $block->getNewAddProductUrl(); ?>',
+                    data: "pTableData=" + TableDatas,
+
+                    success: function(){
+
+                    }
+                });
+
+        });
+    });
+    var pager = new Pager('sampleTbl', 10);
+    pager.init();
+    pager.showPageNav('pager', 'pageNavPosition');
+    pager.showPage(1);
+    function Pager(tableName, itemsPerPage) {
+        this.tableName = tableName;
+        this.itemsPerPage = itemsPerPage;
+        this.currentPage = 1;
+        this.pages = 0;
+        this.inited = false;
+
+        this.showRecords = function(from, to) {
+            var rows = document.getElementById(tableName).rows;
+            // i starts from 1 to skip table header row
+            for (var i = 1; i < rows.length; i++) {
+                if (i < from || i > to)
+                    rows[i].style.display = 'none';
+                else
+                    rows[i].style.display = '';
+            }
+        }
+
+        this.showPage = function(pageNumber) {
+            if (! this.inited) {
+                alert("not inited");
+                return;
+            }
+            var oldPageAnchor = document.getElementById('pg'+this.currentPage);
+            oldPageAnchor.className = 'pg-normal';
+
+            this.currentPage = pageNumber;
+            var newPageAnchor = document.getElementById('pg'+this.currentPage);
+            newPageAnchor.className = 'pg-selected';
+
+            var from = (pageNumber - 1) * itemsPerPage + 1;
+            var to = from + itemsPerPage - 1;
+            this.showRecords(from, to);
+        }
+
+        this.prev = function() {
+            if (this.currentPage > 1)
+                this.showPage(this.currentPage - 1);
+        }
+
+        this.next = function() {
+            if (this.currentPage < this.pages) {
+                this.showPage(this.currentPage + 1);
+            }
+        }
+
+        this.init = function() {
+            var rows = document.getElementById(tableName).rows;
+            var records = (rows.length - 1);
+            this.pages = Math.ceil(records / itemsPerPage);
+            this.inited = true;
+        }
+        this.showPageNav = function(pagerName, positionId) {
+            if (! this.inited) {
+                alert("not inited");
+                return;
+            }
+            var element = document.getElementById(positionId);
+
+            var pagerHtml = '<span onclick="' + pagerName + '.prev();" class="pg-normal"> &#171 Prev </span> | ';
+            for (var page = 1; page <= this.pages; page++)
+                pagerHtml += '<span id="pg' + page + '" class="pg-normal" onclick="' + pagerName + '.showPage(' + page + ');">' + page + '</span> | ';
+            pagerHtml += '<span onclick="'+pagerName+'.next();" class="pg-normal"> Next &#187;</span>';
+
+            element.innerHTML = pagerHtml;
+        }
+    }
+
+</script>
+<style media="screen" type="text/css">
+
+    .pg-normal {
+        color: red;
+        font-weight: normal;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .pg-selected {
+        color: black;
+        font-weight: bold;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+</style>

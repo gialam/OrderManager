@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<config	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="magenest" translate="label" sortOrder="200">
+            <label>Magenest</label>
+        </tab>
+        <section id="ordermanager_labels" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1"	showInStore="1">
+        <label>Order Manager</label>
+        <tab>magenest</tab>
+        <resource>Magenest_OrderManager::config_ordermanager</resource>
+        <group id="ordermanager_editor" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Manager Editor</label>
+            <field	id="ordermanager_remove"	translate="label" type="select"  sortOrder="10" showInDefault="1"	showInWebsite="1"	showInStore="1">
+                <label>Enable ( Remove item(s) Order )</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            </field>
+            <field	id="ordermanager_send_mail"	translate="label" type="select"  sortOrder="10" showInDefault="1"	showInWebsite="1"	showInStore="1">
+                <label>Allows sending mail when Order is accepted</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            </field>
+            <field	id="ordermanager_delete_core"	translate="label" type="select"  sortOrder="10" showInDefault="1"	showInWebsite="1"	showInStore="1">
+                <label>Allows delete Order</label>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            </field>
+            <field	id="ordermanager_deadline"	translate="label" type="select"  sortOrder="10" showInDefault="1"	showInWebsite="1"	showInStore="1">
+                <label>Deadline allows censorship</label>
+                <source_model>Magenest\OrderManager\Model\Config\Source\Option</source_model>
+            </field>
+        </group>
+        </section>
+    </system>
+</config>

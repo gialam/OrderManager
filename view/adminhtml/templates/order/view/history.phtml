@@ -1,0 +1,178 @@
+<?php
+/**
+ * Copyright © 2015 Magenest. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @category  Magenest
+ */
+?>
+
+<?php /** @var  $block Magenest\OrderManager\Block\Adminhtml\Order\Edit */ ?>
+<?php
+//$symbol = $_items->getOrderCurrency()->getCurrencySymbol();
+$symbol = $block->getSymbolItem();
+$_dataOrder = $block->getItemsInfo();
+
+$_billing = $block->getBillingAddress();
+$_shiping = $block->getShippingAddress();
+$order_id = $block->getOrderId();
+?>
+<div class = 'button'>
+<button id="back_content" style="float: left" class="back"
+        onclick="window.location.href='<?php echo $block->getBackUrl() ?>'">Back</button>
+<button id="delete_content" style="float: right" class="back"
+        onclick="window.location.href='<?php echo $block->getDeleteDataUrl() ?>'">Delete</button>
+<button id="accept_content" style="float: right" class="back"
+        onclick="window.location.href='<?php echo $block->getAcceptUrl() ?>'">Accept</button>
+</div>
+</br>
+</br>
+</br>
+
+<form class="form-product-edit"  method="post" id="form-validate" enctype="multipart/form-data"
+      action="<?php $block->getUpdateProductUrl();?>"
+      data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
+    <div class="actions-toolbar">
+        <div class="primary">
+            <button type="submit" class="action update primary" data-action="update-Data"
+                    title="<?php /* @escapeNotVerified */ echo __('Update Data') ?>">
+                <span><?php /* @escapeNotVerified */ echo __('Update Items ') ?></span>
+            </button>
+        </div>
+        <div class="addproduct">
+        <button id="addproduct_content" style="float: right" class="back"
+                onclick="window.location.href='<?php echo $block->getBackUrl() ?>'">Add Products</button>
+        </div>
+    </div>
+
+    <table class="data-table" data-role="flex-table">
+        <div>
+            <font color="red">Items Order</font> </br>
+        </div>
+        <thead>
+        <tr class="headings">
+            <th class="col-product"><span><?php /* @escapeNotVerified */ echo __('Product') ?></span></th>
+            <th class="col-price"><span><?php /* @escapeNotVerified */ echo __('Price') ?></span></th>
+            <th class="col-qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></th>
+            <th class="col-subtotal"><span><?php /* @escapeNotVerified */ echo __('Subtotal') ?></span></th>
+            <th class="col-discount"><span><?php /* @escapeNotVerified */ echo __('Discount') ?></span></th>
+            <th class="col-row-total"><span><?php /* @escapeNotVerified */ echo __('Row Subtotal') ?></span></th>
+        </tr
+        </thead>
+        <tbody>
+        <?php $i = 0 ?>
+        <?php foreach ($_dataOrder as $_data ) { ?>
+            <?php $id_product = $_data->getProductId() ?>
+            <tr>
+                <td data-th="<?php echo $block->escapeHtml(__('Product')) ?>" class="col-product">
+                    <?php echo  $_data->getName(); ?>
+                    <div class="product-sku-block">
+                        <span><?php /* @escapeNotVerified */ echo __('SKU') ?>:</span>
+                        <?php echo $_data->getSku()?>
+                    </div>
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Price')) ?>" class="col-price">
+                    <?php echo $symbol.(float)$_data->getPrice(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Qty')) ?>" class="col-qty">
+                    <div class="control">
+                        <input type="number" name="quantity-<?php echo $id_product  ?>" id="quantity" class="input-number-quantity"
+                               style="width: 50px;" value="<?php echo $_data->getQuantity(); ?>">
+                    </div>
+
+                </td>
+
+                <td data-th="<?php echo $block->escapeHtml(__('Subtotal')) ?>" class="col-subtotal">
+                    <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col-discount">
+                    <?php echo $symbol.(float)$_data->getDiscount(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Row Subtotal')) ?>" class="col-row-total">
+                    <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()); ?>
+
+                </td>
+                <td class="col-actions last">
+                    <a href="<?php echo $block->getRemoveProduct($id_product) ?>" class="action view">
+                        <span><?php /* @escapeNotVerified */ echo __('Remove') ?></span>
+                    </a>
+                </td>
+            </tr>
+        <?php } ?>
+        </tbody>
+    </table>
+</form>
+</br>
+</br>
+<table class="data-table" data-role="flex-table">
+    <div>
+        <font color="red">Address Information </font> </br>
+    </div>
+    <thead>
+    <tr class="headings">
+        <th class="col-billing">
+            <span><?php /* @escapeNotVerified */ echo __('Billing Address') ?></span>
+            <?php if(!empty($_billing->getData())):?>
+            <a href="<?php /* @escapeNotVerified */ echo $block->getBillingUrl($order_id) ?>" class="action view">
+                <span><?php /* @escapeNotVerified */ echo __('Edit') ?></span>
+            </a>
+            <?php endif;?>
+        </th>
+        <th class="col-shipping">
+            <span><?php /* @escapeNotVerified */ echo __('Shipping Address') ?></span>
+            <?php if(!empty($_shiping->getData())):?>
+            <a href="<?php /* @escapeNotVerified */ echo $block->getShippingUrl($order_id) ?>" class="action view">
+                <span><?php /* @escapeNotVerified */ echo __('Edit') ?></span>
+            </a>
+            <?php endif;?>
+        </th>
+    </tr
+    </thead>
+    <tbody>
+        <tr>
+            <td data-th="<?php echo $block->escapeHtml(__('Billing Address')) ?>" class="col-billing">
+                <?php if(!empty($_billing->getData())):?>
+                <?php foreach ($_billing as $billing ) { ?>
+                <?php echo  $billing->getFirstname().' '.$billing->getLastname(); ?>
+                </br>
+                <?php echo  $billing->getCompany(); ?>
+                </br>
+                <?php echo  $billing->getStreet(); ?>
+                </br>
+                <?php echo  $billing->getCity().','.$billing->getRegionId().','.$billing->getPostcode(); ?>
+                </br>
+                <?php echo  $billing->getCountryId(); ?>
+                </br>
+                <?php echo  'T: '.$billing->getTelephone(); ?>
+                <?php } ?>
+                <?php else :?>
+                <?php echo 'No Change' ?>
+                <?php endif;?>
+
+            </td>
+            <td data-th="<?php echo $block->escapeHtml(__('Shipping Address')) ?>" class="col-shipping">
+                <?php if(!empty($_shiping->getData())):?>
+                <?php foreach ($_shiping as $shipping ) { ?>
+                <?php echo  $shipping->getFirstname().' '.$shipping->getLastname(); ?>
+                </br>
+                <?php echo  $shipping->getCompany(); ?>
+                </br>
+                <?php echo  $shipping->getStreet(); ?>
+                </br>
+                <?php echo  $shipping->getCity().','.$shipping->getRegionId().','.$shipping->getPostcode(); ?>
+                </br>
+                <?php echo  $shipping->getCountryId(); ?>
+                </br>
+                <?php echo  'T: '.$shipping->getTelephone(); ?>
+                <?php } ?>
+                 <?php else :?>
+                <?php echo 'No Change' ?>
+                <?php endif;?>
+            </td>
+
+        </tr>
+    </tbody>
+</table>
