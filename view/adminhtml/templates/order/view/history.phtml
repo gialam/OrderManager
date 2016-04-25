@@ -28,9 +28,12 @@ $order_id = $block->getOrderId();
 </br>
 </br>
 </br>
-
+<div class="addproduct">
+    <button id="addproduct_content" style="float: right" class="back"
+            onclick="window.location.href='<?php echo $block->getAddProductUrl() ?>'">Add Products</button>
+</div>
 <form class="form-product-edit"  method="post" id="form-validate" enctype="multipart/form-data"
-      action="<?php $block->getUpdateProductUrl();?>"
+      action="<?php echo $block->getUpdateProductUrl();?>"
       data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
     <div class="actions-toolbar">
         <div class="primary">
@@ -39,12 +42,10 @@ $order_id = $block->getOrderId();
                 <span><?php /* @escapeNotVerified */ echo __('Update Items ') ?></span>
             </button>
         </div>
-        <div class="addproduct">
-        <button id="addproduct_content" style="float: right" class="back"
-                onclick="window.location.href='<?php echo $block->getBackUrl() ?>'">Add Products</button>
-        </div>
     </div>
-
+    <div>
+        <input name="form_key" value="<?php echo $block->getFormKey() ?>" type="hidden">
+    </div>
     <table class="data-table" data-role="flex-table">
         <div>
             <font color="red">Items Order</font> </br>

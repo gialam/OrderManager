@@ -50,14 +50,13 @@ class Edit extends \Magento\Backend\Block\Template
     public function getBackUrl()
     {
         $orderId = $this->getRequest()->getParam('order_id');
-        $data = $this->_orderFactory->create()->load($orderId,'order_id');
-        $id = $data->getId();
+        $id = $this->_orderFactory->create()->load($orderId,'order_id')->getId();
         return $this->getUrl('ordermanager/order/edit',['id'=>$id]);
 //        return $id;
     }
     public function getBaseUrl()
     {
         $orderId = $this->getRequest()->getParam('order_id');
-        return $this->getUrl('ordermanager/address/saveShipping',['order_id'=>$orderId]);
+        return $this->getUrl('ordermanager/address/updateShipping',['order_id'=>$orderId]);
     }
 }

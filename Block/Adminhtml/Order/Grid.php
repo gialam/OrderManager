@@ -28,7 +28,7 @@ class	Grid	extends	\Magento\Backend\Block\Widget\Grid\Extended
     ){
         $this->_orderCollection	=	$orderCollection;
         parent::__construct($context,	$backendHelper,	$data);
-        $this->setEmptyText(__('No	Subscriptions	Found'));
+        $this->setEmptyText(__('No	Product(s)	Found'));
     }
 
     /**
@@ -114,10 +114,10 @@ class	Grid	extends	\Magento\Backend\Block\Widget\Grid\Extended
         $this->getMassactionBlock()->setFormFieldName('order');
 
         $this->getMassactionBlock()->addItem(
-            'delete',
+            'delete_order',
             [
                 'label' => __('Delete'),
-                'url' => $this->getUrl('*/*/massDelete'),
+                'url' => $this->getUrl('*/*/massDeleteOrder'),
                 'confirm' => __('Are you sure to delete ?')
             ]
         );

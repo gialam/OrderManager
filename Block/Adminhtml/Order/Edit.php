@@ -81,7 +81,11 @@ class Edit extends \Magento\Backend\Block\Template
             ->addFieldToFilter('address_type','shipping');
         return $billing;
     }
-
+    public function getAddProductUrl()
+    {
+        $orderId = $this->getOrderId();
+        return $this->getUrl('ordermanager/item/grid',['order_id'=>$orderId]);
+    }
     public function getDeleteDataUrl()
     {
         $orderId = $this->getOrderId();

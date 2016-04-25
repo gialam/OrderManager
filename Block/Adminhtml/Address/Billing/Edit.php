@@ -18,11 +18,13 @@ class Edit extends \Magento\Backend\Block\Template
         \Magento\Backend\Block\Template\Context $context,
         LoggerInterface $loggerInterface,
         \Magenest\OrderManager\Model\OrderAddressFactory $addressFactory,
+        \Magenest\OrderManager\Model\OrderManageFactory $manageFactory,
         Data  $collectionDataShipping,
         array $data =[] )
     {
         $this->_logger         = $loggerInterface;
         $this->_addressFactory = $addressFactory;
+        $this->_manageFactory  = $manageFactory;
         $this->_dataBilling = $collectionDataShipping;
 
         parent::__construct($context, $data);
@@ -47,6 +49,12 @@ class Edit extends \Magento\Backend\Block\Template
     public function getUpdateBillingUrl()
     {
         $orderId = $this->getRequest()->getParam('order_id');
-        return $this->getUrl('ordermanager/address/updatebilling',['order_id'=>$orderId]);
+        return $this->getUrl('ordermanager/address/updateBilling',['order_id'=>$orderId]);
+    }
+    public function getBackUrl()
+    {
+        $orderId = $this->getRequest()->getParam('order_id');
+        $id = $this->_manageFactory->create()->load($orderId,'order_id')->getId();
+        return $this->getUrl('ordermanager/order/edit',['id'=>$id]);
     }
 }

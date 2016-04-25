@@ -5,11 +5,11 @@
  * Date: 17/02/2016
  * Time: 14:12
  */
-namespace Magenest\OrderManager\Controller\Adminhtml\Order;
+namespace Magenest\OrderManager\Controller\Adminhtml\Item;
 
 use Magento\Backend\App\Action;
 use Psr\Log\LoggerInterface;
-class Edit extends \Magento\Backend\App\Action
+class Grid extends \Magento\Backend\App\Action
 {
     /**
      * @var \Magento\Framework\Registry|null
@@ -62,9 +62,9 @@ class Edit extends \Magento\Backend\App\Action
     public function execute()
     {
         // 1. Get ID and return NewPage
-        $id = $this->getRequest()->getParam('id');
+        $orderId = $this->getRequest()->getParam('order_id');
         $this->_view->loadLayout();
-        if ($block = $this->_view->getLayout()->getBlock('order.history.collection.edit')) {
+        if ($block = $this->_view->getLayout()->getBlock('order.item.collection.grid')) {
             $block->setRefererUrl($this->_redirect->getRefererUrl());
         }
         $this->_view->renderLayout();
