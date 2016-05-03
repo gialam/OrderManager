@@ -1,3 +1,4 @@
+<?php /** @var  $block Magenest\OrderManager\Block\Adminhtml\Address\Billing\Edit */ ?>
 <?php
 $_data = $block->getDataBilling();
 foreach ($_data as $data)
@@ -122,12 +123,6 @@ foreach ($_data as $data)
             <button type="submit" class="action save primary" data-action="save-address"
                     title="<?php /* @escapeNotVerified */ echo __('Save Address') ?>">
                 <span><?php /* @escapeNotVerified */ echo __('Save ') ?></span>
-            </button>
-        </div>
-        <div class="secondary">
-            <button type="text" class="action cancel " data-action="cancel-address"
-                    title="<?php /* @escapeNotVerified */ echo __('Cancel') ?>">
-                <span><?php /* @escapeNotVerified */ echo __('Cancel ') ?></span>
             </button>
         </div>
     </div>

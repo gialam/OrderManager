@@ -11,9 +11,11 @@ use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class View extends Template
 {
+    protected $_storeManager;
     /**
      * @var CustomerSession\
      */
@@ -48,9 +50,11 @@ class View extends Template
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productFactory,
         \Magento\Sales\Model\OrderFactory $itemCollectionFactory,
         \Magenest\OrderManager\Model\OrderItemFactory $orderItemFactory,
+        StoreManagerInterface $storemanager,
         array $data =[]
     )
     {
+        $this->_storeManager = $storemanager;
         $this->_customerSession = $customerSession;
         $this->_scopeConfig = $scopeConfig;
         $this->itemCollection        = $itemCollectionFactory;
@@ -84,13 +88,6 @@ class View extends Template
         return $data;
     }
 
-    public function getSubtotal(){
-        $orderId = $this->getRequest()->getParam('order_id');
-        $data = $this->_orderItemFactory->create()->getCollection()->addFieldToFilter('order_id',$orderId);
-        $total = $data->addExpressionFieldToSelect("price", "sum({{price}})", "price");
-        return $total;
-    }
-
     public function getRemoveProduct($id_product)
     {
         $orderId = $this->getRequest()->getParam('order_id');
@@ -119,11 +116,34 @@ class View extends Template
     {
         return $this->getChildHtml('pager');
     }
-
+    public function getSubtotalProduct()
+    {
+        $subtotal = $this->getLayout()->createBlock('Magenest\OrderManager\Block\Product\Subtotal\Total');
+        return $subtotal->toHtml();
+    }
+    public function getImageRender()
+    {
+        $mediaDirectory = $this->_storeManager->getStore()->getBaseUrl(
+            \Magento\Framework\UrlInterface::URL_TYPE_MEDIA
+        );
+//        $imageUrl = $mediaDirectory.'catalog/product/'.$this->_getValue($row);
+//        return '<img src="'.$imageUrl.'" width="50"/>';
+        return $mediaDirectory;
+    }
+    public function getCancelUrl()
+    {
+        $orderId = $this->getRequest()->getParam('order_id');
+        return $this->getUrl('ordermanager/product/cancel',['order_id'=>$orderId]);
+    }
     public function getBackUrl()
     {
         $orderId = $this->getRequest()->getParam('order_id');
         return $this->getUrl('sales/order/view',['order_id'=>$orderId]);
+    }
+    public function getProductNew()
+    {
+        $newProduct = $this->getLayout()->createBlock('Magenest\OrderManager\Block\Product\NewProduct');
+        return $newProduct->toHtml();
     }
 
 }

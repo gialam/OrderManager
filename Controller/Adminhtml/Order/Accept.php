@@ -8,6 +8,7 @@ use Magento\Backend\App\Action\Context;
 use Psr\Log\LoggerInterface;
 use Magenest\OrderManager\Model\OrderItemFactory;
 use Magenest\OrderManager\Model\OrderAddressFactory;
+use Magento\Directory\Model\RegionFactory;
 
 
 /**
@@ -18,23 +19,25 @@ class Accept extends  \Magento\Backend\App\Action
 {
 
     protected $_request;
-
     protected $_logger;
     protected $_itemFactory;
     protected $_addressFactory;
+    protected $_regionFactory;
     /**
      * Save constructor.
      * @param Context $context
      */
     public function __construct(
-        Context $context,
-        LoggerInterface $loggerInterface,
-        OrderItemFactory $itemFactory,
-        OrderAddressFactory $addressFactory
+        Context                $context,
+        LoggerInterface        $loggerInterface,
+        OrderItemFactory       $itemFactory,
+        OrderAddressFactory    $addressFactory,
+        RegionFactory          $regionFactory
     ) {
         $this->_itemFactory    = $itemFactory;
         $this->_addressFactory = $addressFactory;
         $this->_logger         = $loggerInterface;
+        $this->_regionFactory  = $regionFactory;
         parent::__construct($context);
 
     }
@@ -56,8 +59,8 @@ class Accept extends  \Magento\Backend\App\Action
                             ->addFieldToFilter('order_id',$orderId);
         $address        = $this->_addressFactory->create()->getCollection()
                             ->addFieldToFilter('order_id',$orderId);
+
         $i = 0;
-        $j = 0;
             try {
                 if(!empty($items)) {
                     foreach ($items as $item) {
@@ -70,41 +73,42 @@ class Accept extends  \Magento\Backend\App\Action
                             'discount' => $item['discount'],
                             'quantity' => $item['quantity'],
                         ];
-
+                        $this->_logger->addDebug(print_r($dataItem,true));
                         $modelItem = $collections->addFieldToFilter('order_id', $orderId)
                             ->addFieldToFilter('product_id', $productId)->getFirstItem();
-                        $modelItem->addData($dataItem);
-                        $modelItem->save();
+//                        $modelItem->addData($dataItem);
+//                        $modelItem->save();
                         $i++;
                     }
                 }
 
                 if(!empty($address)) {
                     foreach ($address as $infoAddress) {
-                        $collectionsAddress   = $modelAddress->getCollection();
                         $addressId            = $infoAddress['address_id'];
                         $dataAddress = [
-                            'region_id'       => $infoAddress['name'],
-                            'country_id'      => $infoAddress['sku'],
-                            'postcode'        => $infoAddress['price'],
-                            'fax'             => $infoAddress['discount'],
-                            'lastname'        => $infoAddress['quantity'],
-                            'firstname'       => $infoAddress['quantity'],
-                            'street'          => $infoAddress['quantity'],
-                            'city'            => $infoAddress['quantity'],
-                            'telephone'       => $infoAddress['quantity'],
-                            'company'         => $infoAddress['quantity'],
+                            'entity_id'       =>$infoAddress->getAddressId(),
+                            'region_id'       => $infoAddress->getRegionId(),
+                            'country_id'      => $infoAddress->getCountryId(),
+                            'postcode'        => $infoAddress->getPostcode(),
+                            'fax'             => $infoAddress->getFax(),
+                            'lastname'        => $infoAddress->getLastname(),
+                            'firstname'       => $infoAddress->getFirstname(),
+                            'street'          => $infoAddress->getStreet(),
+                            'city'            => $infoAddress->getCity(),
+                            'telephone'       => $infoAddress->getTelephone(),
+                            'company'         => $infoAddress->getCompany(),
+                            'region'          => $this->_regionFactory->create()->load($infoAddress->getRegionId(),'region_id')->getName(),
                         ];
-
-                        $modelAddress = $collectionsAddress->addFieldToFilter('parent_id', $orderId)
-                            ->addFieldToFilter('entity_id',$addressId)->getFirstItem();
+                        $this->_logger->addDebug(print_r($dataAddress,true));
+                        $modelAddress = $modelAddress->getCollection()->addFieldToFilter('entity_id',$addressId)->getFirstItem();
                         $modelAddress->addData($dataAddress);
                         $modelAddress->save();
-                        $j++;
+                        $i++;
+
                     }
                 }
 
-                $this->messageManager->addSuccess(__('Information have accepted .'));
+                $this->messageManager->addSuccess(__('Information has been accepted .'));
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
                 if ($this->getRequest()->getParam('back')) {
 //                    $orderId = $this->getRequest()->getParam('order_id');

@@ -69,7 +69,7 @@ class Save extends \Magento\Framework\App\Action\Action
 //            }
 //            $this->_logger->addDebug(print_r($discount,true));
 //            $this->_logger->addDebug(print_r($productId,true));
-        $collections = $model->getCollection();
+//        $collections = $model->getCollection();
             $totals = 0;
             try {
                 foreach ($items as $item)

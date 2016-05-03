@@ -94,6 +94,15 @@ class	Grid	extends	\Magento\Backend\Block\Widget\Grid\Extended
             ]
         );
         $this->addColumn(
+            'image',
+            [
+                'header' => __('Image'),
+                'index' => 'image',
+                'renderer' => 'Magenest\OrderManager\Block\Adminhtml\Inquiry\Grid\Renderer\Image'
+
+            ]
+        );
+        $this->addColumn(
         'name',
         [
             'header' => __('Product'),
@@ -119,20 +128,20 @@ class	Grid	extends	\Magento\Backend\Block\Widget\Grid\Extended
                 'renderer' => 'Magento\Sales\Block\Adminhtml\Order\Create\Search\Grid\Renderer\Price'
             ]
         );
-        $this->addColumn(
-            'qty',
-            [
-                'filter' => false,
-                'sortable' => false,
-                'header' => __('Quantity'),
-                'renderer' => 'Magento\Sales\Block\Adminhtml\Order\Create\Search\Grid\Renderer\Qty',
-                'name' => 'qty',
-                'inline_css' => 'qty',
-                'type' => 'input',
-                'validate_class' => 'validate-number',
-                'index' => 'qty'
-            ]
-        );
+//        $this->addColumn(
+//            'qty',
+//            [
+//                'filter' => false,
+//                'sortable' => false,
+//                'header' => __('Quantity'),
+//                'renderer' => 'Magento\Sales\Block\Adminhtml\Order\Create\Search\Grid\Renderer\Qty',
+//                'name' => 'qty[]',
+//                'inline_css' => 'qty',
+//                'type' => 'input',
+//                'validate_class' => 'validate-number',
+//                'index' => 'qty'
+//            ]
+//        );
 
         return $this;
     }
@@ -146,12 +155,12 @@ class	Grid	extends	\Magento\Backend\Block\Widget\Grid\Extended
         $this->setMassactionIdField('id');
         $this->getMassactionBlock()->setTemplate('Magento_Backend::widget/grid/massaction_extended.phtml');
         $this->getMassactionBlock()->setFormFieldName('order');
-
+        $orderId = $this->getRequest()->getParam('order_id');
         $this->getMassactionBlock()->addItem(
             'add_item',
             [
                 'label' => __('Add Item(s)'),
-                'url' => $this->getUrl('*/*/massAdd'),
+                'url' => $this->getUrl('ordermanager/item/massAddItem',['order_id'=>$orderId]),
                 'confirm' => __('Are you sure to add product(s) ?')
             ]
         );

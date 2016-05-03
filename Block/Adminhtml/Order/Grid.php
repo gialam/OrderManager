@@ -117,7 +117,7 @@ class	Grid	extends	\Magento\Backend\Block\Widget\Grid\Extended
             'delete_order',
             [
                 'label' => __('Delete'),
-                'url' => $this->getUrl('*/*/massDeleteOrder'),
+                'url' => $this->getUrl('*/*/massDelete'),
                 'confirm' => __('Are you sure to delete ?')
             ]
         );

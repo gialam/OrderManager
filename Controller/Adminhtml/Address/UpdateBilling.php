@@ -38,30 +38,60 @@ class UpdateBilling extends \Magento\Backend\App\Action
     public function execute()
     {
         $data = $this->getRequest()->getParams();
-//        $this->_logger->addDebug(print_r($data,true));
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $model = $this->_objectManager->create('Magenest\OrderManager\Model\OrderAddress');
-        $billingId = $data['billingid'];
+
+
         if ($data) {
+            $billingId = $data['billingid'];
             $id = $this->_manageFactory->create()->load($data['order_id'],'order_id')->getId();
 //            $this->_logger->addDebug(print_r($id,true));
             $model->load($billingId, 'address_id');
-            $dataInfo = [
-                'firstname'     => $data['firstname'],
-                'lastname'      => $data['lastname'],
-                'company'       => $data['company'],
-                'telephone'     => $data['telephone'],
-                'fax'           => $data['fax'],
-                'street'        => $data['street'],
-                'city'          => $data['city'],
-                'postcode'      => $data['postcode'],
-//                'region_id'     => $data ['region_id'],
-                'country_id'    => $data['country_id'],
-            ];
-            $model->addData($dataInfo);
             try {
-                $model->save();
+                if (isset($data['default_billing'])) {
+                    $collection = $model->getCollection()
+                        ->addFieldToFilter('order_id', $data['order_id'])
+                        ->addFieldToFilter('address_type', 'shipping');
+                    foreach ($collection as $collections) {
+                        $dataInfomation = [
+                            'address_id' => $billingId,
+                            'order_id' => $data['order_id'],
+                            'firstname' => $collections->getFirstname(),
+                            'lastname' => $collections->getLastname(),
+                            'company' => $collections->getCompany(),
+                            'telephone' => $collections->getTelephone(),
+                            'fax' => $collections->getFax(),
+                            'street' => $collections->getStreet(),
+                            'city' => $collections->getCity(),
+                            'postcode' => $collections->getPostcode(),
+                            'region_id' => $collections->getRegionId(),
+                            'country_id' => $collections->getCountryId(),
+                            'address_type' => 'billing'
+                        ];
+                        $model->addData($dataInfomation);
+                        $model->save();
+                    }
+
+                } else {
+                    $dataInfo = [
+                        'address_id' => $billingId,
+                        'order_id' => $data['order_id'],
+                        'firstname' => $data['firstname'],
+                        'lastname' => $data['lastname'],
+                        'company' => $data['company'],
+                        'telephone' => $data['telephone'],
+                        'fax' => $data['fax'],
+                        'street' => $data['street'],
+                        'city' => $data['city'],
+                        'postcode' => $data['postcode'],
+//                        'region_id' => $data['region_id'],
+                        'country_id' => $data['country_id'],
+                        'address_type' => 'billing'
+                    ];
+                    $model->addData($dataInfo);
+                    $model->save();
+                }
                 $this->messageManager->addSuccess(__('The Billing address has been saved.'));
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
                 if ($this->getRequest()->getParam('back')) {

@@ -11,15 +11,11 @@
         <group id="ordermanager_editor" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Manager Editor</label>
             <field	id="ordermanager_remove"	translate="label" type="select"  sortOrder="10" showInDefault="1"	showInWebsite="1"	showInStore="1">
-                <label>Enable ( Remove item(s) Order )</label>
-                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-            </field>
-            <field	id="ordermanager_send_mail"	translate="label" type="select"  sortOrder="10" showInDefault="1"	showInWebsite="1"	showInStore="1">
-                <label>Allows sending mail when Order is accepted</label>
+                <label>Enable ( Remove item(s) Order by Admin )</label>
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             </field>
             <field	id="ordermanager_delete_core"	translate="label" type="select"  sortOrder="10" showInDefault="1"	showInWebsite="1"	showInStore="1">
-                <label>Allows delete Order</label>
+                <label>Allows delete Order by Admin</label>
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             </field>
             <field	id="ordermanager_deadline"	translate="label" type="select"  sortOrder="10" showInDefault="1"	showInWebsite="1"	showInStore="1">

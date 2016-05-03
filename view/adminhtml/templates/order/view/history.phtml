@@ -10,12 +10,12 @@
 <?php /** @var  $block Magenest\OrderManager\Block\Adminhtml\Order\Edit */ ?>
 <?php
 //$symbol = $_items->getOrderCurrency()->getCurrencySymbol();
-$symbol = $block->getSymbolItem();
+$symbol     = $block->getSymbolItem();
 $_dataOrder = $block->getItemsInfo();
-
-$_billing = $block->getBillingAddress();
-$_shiping = $block->getShippingAddress();
-$order_id = $block->getOrderId();
+$_billing   = $block->getBillingAddress();
+$_shiping   = $block->getShippingAddress();
+$order_id   = $block->getOrderId();
+$_total     = $block->getTotalInfo();
 ?>
 <div class = 'button'>
 <button id="back_content" style="float: left" class="back"
@@ -63,7 +63,9 @@ $order_id = $block->getOrderId();
         <tbody>
         <?php $i = 0 ?>
         <?php foreach ($_dataOrder as $_data ) { ?>
-            <?php $id_product = $_data->getProductId() ?>
+            <?php $itemId= $_data->getId();
+            $id_product = $_data->getProductId();
+            ?>
             <tr>
                 <td data-th="<?php echo $block->escapeHtml(__('Product')) ?>" class="col-product">
                     <?php echo  $_data->getName(); ?>
@@ -96,11 +98,13 @@ $order_id = $block->getOrderId();
                     <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()); ?>
 
                 </td>
+            <?php if($block->getEnableRemove()==1):?>
                 <td class="col-actions last">
-                    <a href="<?php echo $block->getRemoveProduct($id_product) ?>" class="action view">
+                    <a href="<?php echo $block->getRemoveProduct($itemId) ?>" class="action view">
                         <span><?php /* @escapeNotVerified */ echo __('Remove') ?></span>
                     </a>
                 </td>
+            <?php endif;?>
             </tr>
         <?php } ?>
         </tbody>
@@ -108,6 +112,18 @@ $order_id = $block->getOrderId();
 </form>
 </br>
 </br>
+<div align="right">
+
+    <?php echo  'Discount:'.$symbol.$block->getTotalDiscount(); ?>
+    <br>
+    <?php echo  'Subtotal:'.$symbol.$_total->getSubtotal(); ?>
+    <br>
+    <?php echo  'Shipping & Handling :'.$symbol.(float)$_total->getShippingAndHandling(); ?>
+    </br>
+    <?php echo  'Grand Total:'.$symbol.$_total->getGrandTotal(); ?>
+    </br>
+
+</div>
 <table class="data-table" data-role="flex-table">
     <div>
         <font color="red">Address Information </font> </br>
@@ -143,9 +159,9 @@ $order_id = $block->getOrderId();
                 </br>
                 <?php echo  $billing->getStreet(); ?>
                 </br>
-                <?php echo  $billing->getCity().','.$billing->getRegionId().','.$billing->getPostcode(); ?>
+                <?php echo  $billing->getCity().','.$block->getBillingRegionName().','.$billing->getPostcode(); ?>
                 </br>
-                <?php echo  $billing->getCountryId(); ?>
+                <?php echo  $block->getBillingCountryName(); ?>
                 </br>
                 <?php echo  'T: '.$billing->getTelephone(); ?>
                 <?php } ?>
@@ -163,9 +179,9 @@ $order_id = $block->getOrderId();
                 </br>
                 <?php echo  $shipping->getStreet(); ?>
                 </br>
-                <?php echo  $shipping->getCity().','.$shipping->getRegionId().','.$shipping->getPostcode(); ?>
+                <?php echo  $shipping->getCity().','.$block->getShippingRegionName().','.$shipping->getPostcode(); ?>
                 </br>
-                <?php echo  $shipping->getCountryId(); ?>
+                <?php echo  $block->getShippingCountryName(); ?>
                 </br>
                 <?php echo  'T: '.$shipping->getTelephone(); ?>
                 <?php } ?>

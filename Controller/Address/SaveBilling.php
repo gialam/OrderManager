@@ -58,7 +58,11 @@ class SaveBilling extends \Magento\Framework\App\Action\Action
     {
         $data = $this->getRequest()->getParams();
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
+
         $order = $this->getRequest()->getParam('order_id');
+        /**
+         * get Data order on sales
+         */
         $orderCollection = $this->_orderFactory->create()->load($order);
         $status = $orderCollection->getStatus();
         $firstName  = $orderCollection->getCustomerFirstname();
@@ -70,82 +74,84 @@ class SaveBilling extends \Magento\Framework\App\Action\Action
 
         if ($data) {
 
-            $modelOrder->load($order,'order_id');
+            $modelOrder->load($order, 'order_id');
             $dataOrder = [
-                'order_id'       => $order,
-                'status'         => $status,
-                'customer_name'  =>  $firstName.' '.$lastName,
+                'order_id' => $order,
+                'status' => $status,
+                'customer_name' => $firstName . ' ' . $lastName,
                 'customer_email' => $email
             ];
             $modelOrder->addData($dataOrder);
 
             $billingId = $data['billingid'];
             $model->load($billingId, 'address_id');
-            if(isset($data['default_billing'])){
-                $collections = $this->_addressFactory->create()->getCollection()
-                ->addFieldToFilter('order_id',$order)
-                    ->addFieldToFilter('address_type','shipping');
 
-                foreach ($collections as  $collection) {
-                    $dataInfo = [
-                        'address_id'    => $billingId,
-                        'order_id'      => $order,
-                        'firstname'     => $collection->getFirstname(),
-                        'lastname'      => $collection->getLastname(),
-                        'company'       => $collection->getCompany(),
-                        'telephone'     => $collection->getTelephone(),
-                        'fax'           => $collection->getFax(),
-                        'street'        => $collection->getStreet(),
-                        'city'          => $collection->getCity(),
-                        'postcode'      => $collection->getPostcode(),
-                        'region_id'     => $collection->getRegionId(),
-                        'country_id'    => $collection->getCountryId(),
-                        'address_type'  => 'billing'
-                    ];
-                }
-            }
-            else
-            {
-            $dataInfo = [
-                'address_id'      => $billingId,
-                'order_id'        => $order,
-                'firstname'       => $data['firstname'],
-                'lastname'        => $data['lastname'],
-                'company'         => $data['company'],
-                'telephone'       => $data['telephone'],
-                'fax'             => $data['fax'],
-                'street'          => $data['street'],
-                'city'            => $data['city'],
-                'postcode'        => $data['postcode'],
-                'region_id'       => $data['region_id'],
-                'country_id'      => $data['country_id'],
-                'address_type'    => 'billing'
-            ];
+//            $this->_logger->addDebug(print_r($dataInfo,true));
 
-            $model->addData($dataInfo);
-            try {
-                $modelOrder->save();
-                $model->save();
-                $this->messageManager->addSuccess(__('Billing Address has been sent to checker.'));
-                $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
-                if ($this->getRequest()->getParam('back'))
-                {
+                try {
+                    if (isset($data['default_billing'])) {
+                        $collection = $this->_addressFactory->create()->getCollection()
+                            ->addFieldToFilter('order_id', $order)
+                            ->addFieldToFilter('address_type', 'shipping');
+                        foreach ($collection as $collections) {
+                            $dataInfomation = [
+                                'address_id' => $billingId,
+                                'order_id' => $order,
+                                'firstname' => $collections->getFirstname(),
+                                'lastname' => $collections->getLastname(),
+                                'company' => $collections->getCompany(),
+                                'telephone' => $collections->getTelephone(),
+                                'fax' => $collections->getFax(),
+                                'street' => $collections->getStreet(),
+                                'city' => $collections->getCity(),
+                                'postcode' => $collections->getPostcode(),
+                                'region_id' => $collections->getRegionId(),
+                                'country_id' => $collections->getCountryId(),
+                                'address_type' => 'billing'
+                            ];
+                            $model->addData($dataInfomation);
+                            $model->save();
+                        }
+
+                    } else {
+                        $dataInfo = [
+                            'address_id' => $billingId,
+                            'order_id' => $order,
+                            'firstname' => $data['firstname'],
+                            'lastname' => $data['lastname'],
+                            'company' => $data['company'],
+                            'telephone' => $data['telephone'],
+                            'fax' => $data['fax'],
+                            'street' => $data['street'],
+                            'city' => $data['city'],
+                            'postcode' => $data['postcode'],
+                            'region_id' => $data['region_id'],
+                            'country_id' => $data['country_id'],
+                            'address_type' => 'billing'
+                        ];
+                        $model->addData($dataInfo);
+                        $model->save();
+                    }
+                    $modelOrder->save();
+
+                    $this->messageManager->addSuccess(__('Billing Address has been sent to checker.'));
+                    $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
+                    if ($this->getRequest()->getParam('back')) {
+                        return $resultRedirect->setPath('sales/order/view',
+                            ['order_id' => $this->getRequest()->getParam('order_id')]);
+                    }
                     return $resultRedirect->setPath('sales/order/view',
                         ['order_id' => $this->getRequest()->getParam('order_id')]);
-                }
-                return $resultRedirect->setPath('sales/order/view',
-                    ['order_id' => $this->getRequest()->getParam('order_id')]);
-            } catch (\LocalizedException $e) {
-                $this->messageManager->addError($e->getMessage());
+                } catch (\LocalizedException $e) {
+                    $this->messageManager->addError($e->getMessage());
 
-            } catch (\Exception $e) {
-                $this->messageManager->addError($e, __('Something went wrong while saving the billing address.'));
-                $this->_objectManager->get('Psr\Log\LoggerInterface')->critical($e);
-                $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData($data);
-                return $resultRedirect->setPath('*/*/edit', ['id' => $this->getRequest()->getParam('id')]);
+                } catch (\Exception $e) {
+                    $this->messageManager->addError($e, __('Something went wrong while saving the billing address.'));
+                    $this->_objectManager->get('Psr\Log\LoggerInterface')->critical($e);
+                    $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData($data);
+                    return $resultRedirect->setPath('*/*/edit', ['id' => $this->getRequest()->getParam('id')]);
+                }
             }
-        }
-    }
         return $resultRedirect->setPath('sales/order/view',['order_id' =>$this->getRequest()->getParam('order_id')]);
     }
 

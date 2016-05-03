@@ -13,12 +13,14 @@ class Edit extends \Magento\Backend\Block\Template
     protected $_logger;
     protected $_addressFactory;
     protected $_dataBilling;
+    protected $_regionFactory;
 
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         LoggerInterface $loggerInterface,
         \Magenest\OrderManager\Model\OrderAddressFactory $addressFactory,
         \Magenest\OrderManager\Model\OrderManageFactory $manageFactory,
+        \Magento\Directory\Model\RegionFactory $regionFactory,
         Data  $collectionDataShipping,
         array $data =[] )
     {
@@ -26,7 +28,7 @@ class Edit extends \Magento\Backend\Block\Template
         $this->_addressFactory = $addressFactory;
         $this->_manageFactory  = $manageFactory;
         $this->_dataBilling = $collectionDataShipping;
-
+        $this->_regionFactory = $regionFactory;
         parent::__construct($context, $data);
     }
     protected function _construct()
@@ -40,6 +42,22 @@ class Edit extends \Magento\Backend\Block\Template
          ->addFieldToFilter('order_id',$orderId)
          ->addFieldToFilter('address_type','billing');
      return $data;
+    }
+    public function getRegionId()
+    {
+        $collection = $this->getDataBilling();
+        foreach($collection as $collections)
+        {
+            $region = $collections->getRegionId();
+
+        }
+        return $region;
+    }
+    public function getRegionName()
+    {
+        $id = $this->getRegionId();
+        $collection = $this->_regionFactory->create()->load($id,'region_id')->getName();
+        return $collection;
     }
     public function getCountryBillingHtmlSelect()
     {

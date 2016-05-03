@@ -37,12 +37,15 @@ class Update extends \Magento\Framework\App\Action\Action
         RequestInterface $request,
         LoggerInterface $loggerInterface,
         OrderFactory $orderFactory,
+        \Magenest\OrderManager\Model\OrderItemFactory $orderItemFactory,
+        \Magenest\OrderManager\Model\OrderAddressFactory $addressFactory,
         array $data = []
     ) {
-
+        $this->_orderItemFactory = $orderItemFactory;
         $this->_request         = $request;
         $this->_logger          = $loggerInterface;
         $this->_orderFactory   = $orderFactory;
+        $this->_addressFactory  = $addressFactory;
         parent::__construct($context);
 
     }
@@ -56,17 +59,44 @@ class Update extends \Magento\Framework\App\Action\Action
     {
         $data = $this->getRequest()->getParams();
         $orderId = $this->getRequest()->getParam('order_id');
+
         $orderCollection = $this->_orderFactory->create()->load($orderId);
         $status = $orderCollection->getStatus();
         $firstName  = $orderCollection->getCustomerFirstname();
         $lastName   = $orderCollection->getCustomerLastname();
         $email = $orderCollection->getCustomerEmail();
+
+        /**
+         * get data for total
+         */
+        $priceShipping = $orderCollection->getBaseShippingAmount();
+        $tax = $orderCollection->getBaseTaxAmount();
+        $collection = $this->_orderItemFactory->create()->getCollection()->addFieldToFilter('order_id',$orderId);
+        $sum = 0;
+        $i = 0;
+        $discounts = 0;
+        foreach($collection as $collections )
+        {
+            $price = $collections->getPrice();
+            $quantity = $collections->getQuantity();
+            $subtotal = $price * $quantity;
+            $discount = $collections->getDiscount();
+            $i++;
+            $sum += $subtotal;
+            $discounts += $discount;
+
+        }
+        $grandTotal = $sum + $priceShipping + $tax + $discounts;
+
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-        if ($data) {
-            $id = $data['order_id'];
-//            $this->_logger->addDebug(print_r($id,true));
 
+        if ($data) {
+
+            /**
+             * save order info
+             */
+            $id = $data['order_id'];
             $model = $this->_objectManager->create('Magenest\OrderManager\Model\OrderManage');
             $model->load($id,'order_id');
             $dataInfo = [
@@ -76,11 +106,30 @@ class Update extends \Magento\Framework\App\Action\Action
                 'customer_email' => $email
             ];
             $model->addData($dataInfo);
+            /**
+             * save order total
+             */
+            $modelGrid = $this->_objectManager->create('Magenest\OrderManager\Model\OrderGrid');
+            $modelGrid->load($orderId,'increment_id');
+            $dataGrid = [
+                'increment_id' => $orderId,
+                'grand_total' => $grandTotal,
+                'subtotal' =>  $sum,
+                'shipping_and_handling' => $priceShipping,
+            ];
+            $modelGrid->addData($dataGrid);
+
+            /**
+             * save item(s) order
+             */
             $modelLast = $this->_objectManager->create('Magenest\OrderManager\Model\OrderItem');
 
             $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData($model->getData());
            $totals = 0;
             try {
+                /**
+                 * save item(s) order
+                 */
                 foreach( $orderCollection->getAllItems() as $item){
                     $collections = $modelLast->getCollection();
                     $dataItem = [
@@ -99,14 +148,17 @@ class Update extends \Magento\Framework\App\Action\Action
                     $modelLast->save();
                     $totals++;
                 }
+
+
                 $model->save();
+                $modelGrid->save();
                 $this->messageManager->addSuccess(__('Please wait ulti informations has through !. Email will send to you'));
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
                 if ($this->getRequest()->getParam('back')) {
 //                    $orderId = $this->getRequest()->getParam('order_id');
-                    return $resultRedirect->setPath('sales/order/view',['order_id'=>$id]);
+                    return $resultRedirect->setPath('ordermanager/product/view',['order_id'=>$id]);
                 }
-                return $resultRedirect->setPath('sales/order/view',['order_id'=>$id]);
+                return $resultRedirect->setPath('ordermanager/product/view',['order_id'=>$id]);
             } catch (\LocalizedException $e) {
                 $this->messageManager->addError($e->getMessage());
 
@@ -114,10 +166,10 @@ class Update extends \Magento\Framework\App\Action\Action
                 $this->messageManager->addError($e, __('Something went wrong while update order'));
                 $this->_objectManager->get('Psr\Log\LoggerInterface')->critical($e);
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData($data);
-                return $resultRedirect->setPath('sales/order/view',['order_id'=>$id]);
+                return $resultRedirect->setPath('ordermanager/product/view',['order_id'=>$id]);
             }
         }
-        return $resultRedirect->setPath('sales/order/view',['order_id'=>$orderId]);
+        return $resultRedirect->setPath('ordermanager/product/view',['order_id'=>$orderId]);
 
     }
 

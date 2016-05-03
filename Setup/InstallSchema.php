@@ -73,8 +73,8 @@ class InstallSchema implements InstallSchemaInterface
                 'Customer Email'
             )
             ->setComment('Magenest Order Manager Items');
+            $installer->getConnection()->createTable($table);
 
-        $installer->getConnection()->createTable($table);
             $table = $installer->getConnection()->newTable(
                 $installer->getTable('magenest_order_manager_item')
             )->addColumn(
@@ -252,6 +252,74 @@ class InstallSchema implements InstallSchemaInterface
                 'Address Type'
             )->setComment('Magenest Order Manager Address');
 
+        $installer->getConnection()->createTable($table);
+
+        $table = $installer->getConnection()
+            ->newTable($installer->getTable('magenest_order_manager_grid'))
+            ->addColumn(
+                'id',
+                Table::TYPE_INTEGER,
+                null,
+                [   'identity' => true, 'nullable' => false, 'primary' => true],
+                'Id'
+            )
+            ->addColumn(
+                'increment_id',
+                Table::TYPE_INTEGER,
+                255,
+                ['nullable' => false],
+                'Increment Id'
+            )
+            ->addColumn(
+                'grand_total',
+                Table::TYPE_TEXT,
+                255,
+                ['nullable' => true],
+                'Grand Total'
+            )
+            ->addColumn(
+                'shipping_name',
+                Table::TYPE_TEXT,
+                255,
+                ['nullable' => true],
+                'Shipping Name'
+            )
+            ->addColumn(
+                'billing_name',
+                Table::TYPE_TEXT,
+                255,
+                ['nullable' => true],
+                'Billing Name'
+            )
+            ->addColumn(
+                'billing_address',
+                Table::TYPE_TEXT,
+                255,
+                ['nullable' => true],
+                'Billing Address'
+            )
+            ->addColumn(
+                'shipping_address',
+                Table::TYPE_TEXT,
+                255,
+                ['nullable' => true],
+                'Shipping Address'
+            )
+            ->addColumn(
+                'subtotal',
+                Table::TYPE_TEXT,
+                255,
+                ['nullable' => true],
+                'Subtotal'
+            )
+            ->addColumn(
+                'shipping_and_handling',
+                Table::TYPE_TEXT,
+                255,
+                ['nullable' => true],
+                'Shipping and handling amount'
+            )
+            ->setComment('Magenest Order Manager Grid');
         $installer->getConnection()->createTable($table);
 
         $installer->endSetup();
