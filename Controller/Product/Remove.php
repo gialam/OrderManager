@@ -52,20 +52,15 @@ class Remove extends \Magento\Framework\App\Action\Action
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $id = $data['item_id'];
+        $this->_logger->addDebug(print_r($id,true));
         if ($data) {
           $model = $this->_objectManager->create('Magenest\OrderManager\Model\OrderItem');
-//            $id = $this->getRequest()->getParam('product_id');
-//            if ($id) {
-                $model->load($id);
-//                if ($data != $model->getId()) {
-//                    throw new \Magento\Framework\Exception\LocalizedException(__('Wrong label rule.'));
-//                }
-//            }
+            $modelData =  $model->load($id,'product_id');
 
-            $model->setData($id);
             $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData($model->getData());
             try {
-                $model->delete();
+                $modelData->setData($id);
+                $modelData->delete();
                 $this->messageManager->addSuccess(__('Product have deleted .'));
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
                 if ($this->getRequest()->getParam('back')) {

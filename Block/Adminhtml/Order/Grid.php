@@ -28,7 +28,7 @@ class	Grid	extends	\Magento\Backend\Block\Widget\Grid\Extended
     ){
         $this->_orderCollection	=	$orderCollection;
         parent::__construct($context,	$backendHelper,	$data);
-        $this->setEmptyText(__('No	Product(s)	Found'));
+        $this->setEmptyText(__('No	Order change'));
     }
 
     /**
@@ -64,6 +64,13 @@ class	Grid	extends	\Magento\Backend\Block\Widget\Grid\Extended
             ]
         );
         $this->addColumn(
+            'status_check',
+            [
+                'header' =>__('Sensorship'),
+                'index' => 'status_check',
+            ]
+        );
+        $this->addColumn(
             'customer_name',
             [
                 'header' =>__('Customer Name'),
@@ -80,7 +87,7 @@ class	Grid	extends	\Magento\Backend\Block\Widget\Grid\Extended
         $this->addColumn(
             'edit',
             [
-                'header' => __('Edit'),
+                'header' => __('Action'),
                 'type' => 'action',
                 'getter' => 'getId',
                 'actions' => [

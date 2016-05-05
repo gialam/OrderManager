@@ -75,14 +75,12 @@ class Edit extends \Magento\Backend\Block\Template
       \Magenest\OrderManager\Model\OrderManageFactory   $orderFactory,
       \Magenest\OrderManager\Model\Connector            $connector,
       \Magenest\OrderManager\Model\OrderAddressFactory  $addressFactory,
-      \Magenest\OrderManager\Model\OrderGridFactory     $gridFactory,
       \Magento\Directory\Model\RegionFactory            $regionFactory,
       \Magento\Directory\Model\CountryFactory           $countryFactory,
       OrderFactory                                      $ordercoreFactory,
       LoggerInterface                                   $loggerInterface,
       array $data =[] )
     {
-      $this->_gridFactory      = $gridFactory;
       $this->_logger           = $loggerInterface;
       $this->_itemFactory      = $itemFactory;
       $this->_orderFactory     = $orderFactory;
@@ -273,15 +271,51 @@ class Edit extends \Magento\Backend\Block\Template
         return $enable;
     }
 
-    public function getBackUrl()
+    public function getSubtotal()
     {
-        return $this->getUrl('ordermanager/order/');
+        $sum = 0;
+        $i = 0;
+        foreach($this->getItemsInfo() as $collections)
+        {
+            $price = $collections->getPrice();
+            $quantity = $collections->getQuantity();
+            $subtotal = $price * $quantity;
+            $i++;
+            $sum += $subtotal;
+
+        }
+
+        return  $sum;
     }
-    public function getTotalInfo()
+    public function getShippingCost()
     {
         $orderId = $this->getOrderId();
-        $data = $this->_gridFactory->create()->load($orderId,'increment_id');
-        return $data;
+        $cost = $this->_ordercoreFactory->create()->load($orderId)->getShippingAmount();
+        return $cost;
+    }
+    public function getTaxAmount()
+    {
+        $sumTax = 0;
+        $i = 0;
+        foreach($this->getItemsInfo() as $collections)
+        {
+            $tax   = $collections->getTax();
+            $price = $collections->getPrice();
+            $quantity = $collections->getQuantity();
+            $total = $price * $quantity * $tax / 100;
+            $i++;
+            $sumTax += $total;
+
+        }
+
+        return  $sumTax;
+    }
+    public function getGrandTotal()
+    {
+
+        $grandTotal = $this->getSubtotal() + ($this->getShippingCost()) +
+            $this->getTaxAmount() - $this->getTotalDiscount();
+        return $grandTotal;
     }
     public function getTotalDiscount()
     {
@@ -289,12 +323,19 @@ class Edit extends \Magento\Backend\Block\Template
         $i = 0;
         foreach($this->getItemsInfo() as $collections)
         {
-            $discount = $collections->getDiscount();
+            $discount    = $collections->getDiscount();
+            $rowTotal    = ($collections->getPrice())*($collections->getQuantity()) ;
+            $rowDiscount = ($rowTotal * $discount)/100 ;
+
             $i++;
-            $discounts += $discount;
+            $discounts += $rowDiscount;
 
         }
         return $discounts;
+    }
+    public function getBackUrl()
+    {
+        return $this->getUrl('ordermanager/order/');
     }
     protected function _isAllowed()
     {

@@ -38,6 +38,7 @@ $symbol = $block->getSymbolCurrency();
             <th class="col-qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></th>
             <th class="col-subtotal"><span><?php /* @escapeNotVerified */ echo __('Subtotal') ?></span></th>
             <th class="col-discount"><span><?php /* @escapeNotVerified */ echo __('Discount') ?></span></th>
+            <th class="col-tax"><span><?php /* @escapeNotVerified */ echo __('Tax') ?></span></th>
             <th class="col-row-total"><span><?php /* @escapeNotVerified */ echo __('Row Subtotal') ?></span></th>
             <th class="col-action"><span><?php /* @escapeNotVerified */ echo __('Action') ?></span></th>
         </tr
@@ -71,11 +72,16 @@ $symbol = $block->getSymbolCurrency();
 
                 </td>
                 <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col-discount">
-                    <?php echo $symbol.$_data->getDiscount(); ?>
+                    <?php echo $_data->getDiscount().'%'; ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Tax')) ?>" class="col-tax">
+                    <?php echo (float)$_data->getTax().'%'; ?>
 
                 </td>
                 <td data-th="<?php echo $block->escapeHtml(__('Row Subtotal')) ?>" class="col-row-total">
-                    <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()); ?>
+                    <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()
+                        *( 1 - ($_data->getDiscount() *$_data->getTax())/100 )); ?>
 
                 </td>
                 <td class="col-actions last">

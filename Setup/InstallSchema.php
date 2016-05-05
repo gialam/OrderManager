@@ -52,11 +52,25 @@ class InstallSchema implements InstallSchemaInterface
                 'Order Id'
             )
             ->addColumn(
+                'customer_id',
+                Table::TYPE_INTEGER,
+                255,
+                ['nullable' => false],
+                'Customer Id'
+            )
+            ->addColumn(
                 'status',
                 Table::TYPE_TEXT,
                 255,
                 ['nullable' => true],
                 'Status'
+            )
+            ->addColumn(
+                'status_check',
+                Table::TYPE_TEXT,
+                255,
+                ['nullable' => true],
+                'Status Check'
             )
             ->addColumn(
                 'customer_name',
@@ -131,6 +145,12 @@ class InstallSchema implements InstallSchemaInterface
                 255,
                 ['nullable' => false],
                 'Discount'
+            )->addColumn(
+                'tax',
+                Table::TYPE_TEXT,
+                255,
+                ['nullable' => false],
+                'Tax'
             )->addColumn(
                 'color',
                 Table::TYPE_TEXT,

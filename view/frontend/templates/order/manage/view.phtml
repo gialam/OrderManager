@@ -7,46 +7,17 @@
  */
 ?>
 
-<?php /** @var  $block Magenest\OrderManager\Block\Adminhtml\Order\Edit */ ?>
+<?php /** @var  $block Magenest\OrderManager\Block\Order\ViewManage */ ?>
 <?php
-//$symbol = $_items->getOrderCurrency()->getCurrencySymbol();
 $symbol     = $block->getSymbolItem();
 $_dataOrder = $block->getItemsInfo();
 $_billing   = $block->getBillingAddress();
 $_shipping   = $block->getShippingAddress();
 $order_id   = $block->getOrderId();
-$_total     = $block->getTotalInfo();
+//$_total     = $block->getTotalInfo();
 ?>
-<div class = 'button'>
-<button id="back_content" style="float: left" class="back"
-        onclick="window.location.href='<?php echo $block->getBackUrl() ?>'">Back</button>
-<button id="delete_content" style="float: right" class="back"
-        onclick="window.location.href='<?php echo $block->getDeleteDataUrl() ?>'">Delete</button>
-<button id="accept_content" style="float: right" class="back"
-        onclick="window.location.href='<?php echo $block->getAcceptUrl() ?>'">Accept</button>
-</div>
-</br>
-</br>
-</br>
-<div class="addproduct">
-    <button id="addproduct_content" style="float: right" class="back"
-            onclick="window.location.href='<?php echo $block->getAddProductUrl() ?>'">Add Products</button>
-</div>
-<form class="form-product-edit"  method="post" id="form-validate" enctype="multipart/form-data"
-      action="<?php echo $block->getUpdateProductUrl();?>"
-      data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
-    <div class="actions-toolbar">
-        <div class="primary">
-            <button type="submit" class="action update primary" data-action="update-Data"
-                    title="<?php /* @escapeNotVerified */ echo __('Update Data') ?>">
-                <span><?php /* @escapeNotVerified */ echo __('Update Items ') ?></span>
-            </button>
-        </div>
-    </div>
-    <div>
-        <input name="form_key" value="<?php echo $block->getFormKey() ?>" type="hidden">
-    </div>
-    <table class="data-table" data-role="flex-table">
+<div class="table-wrapper collection-products" id="product_order">
+    <table id="my-collection-products-table" class="data table table-collection-products">
         <div>
             <font color="red">Items Order</font> </br>
         </div>
@@ -80,11 +51,7 @@ $_total     = $block->getTotalInfo();
 
                 </td>
                 <td data-th="<?php echo $block->escapeHtml(__('Qty')) ?>" class="col-qty">
-                    <div class="control">
-                        <input type="number" name="quantity-<?php echo $productId  ?>" id="quantity" class="input-number-quantity"
-                               style="width: 50px;" value="<?php echo $_data->getQuantity(); ?>">
-                    </div>
-
+                    <?php echo $_data->getQuantity(); ?>
                 </td>
 
                 <td data-th="<?php echo $block->escapeHtml(__('Subtotal')) ?>" class="col-subtotal">
@@ -92,10 +59,8 @@ $_total     = $block->getTotalInfo();
 
                 </td>
                 <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col-discount">
-                    <div class="control">
-                        <input type="text" name="discount-<?php echo $productId  ?>" id="discount" class="input-percent-discount"
-                               style="width: 50px;" value="<?php echo $_data->getDiscount(); ?>">%
-                    </div>
+                    <?php echo $_data->getDiscount(); ?>%
+                </td>
                 <td data-th="<?php echo $block->escapeHtml(__('Tax')) ?>" class="col-tax">
                     <?php echo (float)$_data->getTax().'%'; ?>
 
@@ -103,37 +68,16 @@ $_total     = $block->getTotalInfo();
                 </td>
                 <td data-th="<?php echo $block->escapeHtml(__('Row Subtotal')) ?>" class="col-row-total">
                     <?php echo $symbol.($_data->getPrice()) * ($_data->getQuantity()
-                        * (1-($_data->getTax() + $_data->getDiscount())/100)); ?>
+                            * (1-($_data->getTax() + $_data->getDiscount())/100)); ?>
 
                 </td>
-            <?php if($block->getEnableRemove()==1):?>
-                <td class="col-actions last">
-                    <a href="<?php echo $block->getRemoveProduct($itemId) ?>" class="action view">
-                        <span><?php /* @escapeNotVerified */ echo __('Remove') ?></span>
-                    </a>
-                </td>
-            <?php endif;?>
             </tr>
         <?php } ?>
         </tbody>
     </table>
-</form>
-</br>
-</br>
-<div align="right">
-
-    <?php echo  'Discount:'.$symbol.$block->getTotalDiscount(); ?>
-    <br>
-    <?php echo  'Subtotal:'.$symbol.$block->getSubtotal(); ?>
-    <br>
-    <?php echo  'Shipping & Handling :'.$symbol.(float)$block->getShippingCost(); ?>
-    </br>
-    <?php echo  'Tax:'.$symbol.$block->getTaxAmount(); ?>
-    <br>
-    <?php echo  'Grand Total:'.$symbol.$block->getGrandTotal(); ?>
-    </br>
-
 </div>
+</br>
+</br>
 <?php if (!empty($_billing->getData()) || !empty($_shipping->getData())):?>
 <table class="data-table" data-role="flex-table">
     <div>
@@ -143,26 +87,16 @@ $_total     = $block->getTotalInfo();
     <tr class="headings">
         <th class="col-billing">
             <span><?php /* @escapeNotVerified */ echo __('Billing Address') ?></span>
-            <?php if(!empty($_billing->getData())):?>
-            <a href="<?php /* @escapeNotVerified */ echo $block->getBillingUrl($order_id) ?>" class="action view">
-                <span><?php /* @escapeNotVerified */ echo __('Edit') ?></span>
-            </a>
-            <?php endif;?>
         </th>
         <th class="col-shipping">
             <span><?php /* @escapeNotVerified */ echo __('Shipping Address') ?></span>
-            <?php if(!empty($_shipping->getData())):?>
-            <a href="<?php /* @escapeNotVerified */ echo $block->getShippingUrl($order_id) ?>" class="action view">
-                <span><?php /* @escapeNotVerified */ echo __('Edit') ?></span>
-            </a>
-            <?php endif;?>
         </th>
     </tr
     </thead>
     <tbody>
-        <tr>
-            <td data-th="<?php echo $block->escapeHtml(__('Billing Address')) ?>" class="col-billing">
-                <?php if(!empty($_billing->getData())):?>
+    <tr>
+        <td data-th="<?php echo $block->escapeHtml(__('Billing Address')) ?>" class="col-billing">
+            <?php if(!empty($_billing->getData())):?>
                 <?php foreach ($_billing as $billing ) { ?>
                 <?php echo  $billing->getFirstname().' '.$billing->getLastname(); ?>
                 </br>
@@ -180,9 +114,9 @@ $_total     = $block->getTotalInfo();
                 <?php echo 'No Change' ?>
                 <?php endif;?>
 
-            </td>
-            <td data-th="<?php echo $block->escapeHtml(__('Shipping Address')) ?>" class="col-shipping">
-                <?php if(!empty($_shipping->getData())):?>
+        </td>
+        <td data-th="<?php echo $block->escapeHtml(__('Shipping Address')) ?>" class="col-shipping">
+            <?php if(!empty($_shipping->getData())):?>
                 <?php foreach ($_shipping as $shipping ) { ?>
                 <?php echo  $shipping->getFirstname().' '.$shipping->getLastname(); ?>
                 </br>
@@ -199,9 +133,9 @@ $_total     = $block->getTotalInfo();
                  <?php else :?>
                 <?php echo 'No Change' ?>
                 <?php endif;?>
-            </td>
+        </td>
 
-        </tr>
+    </tr>
     </tbody>
 </table>
-<?php endif; ?>
+<?php endif;?>

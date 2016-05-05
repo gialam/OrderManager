@@ -107,8 +107,10 @@ class Total extends Template
         foreach($this->getDataCollection() as $collections)
         {
             $discount = $collections->getDiscount();
+            $rowTotal    = ($collections->getPrice())*($collections->getQuantity()) ;
+            $rowDiscount = ($rowTotal * $discount)/100 ;
             $i++;
-            $discounts += $discount;
+            $discounts += $rowDiscount;
 
         }
         return $discounts;
@@ -123,7 +125,7 @@ class Total extends Template
     {
 
         $grandTotal = $this->getSubtotal() + $this->getShippingHandling() +
-            $this->getTaxAmount() + $this->getDiscount();
+            $this->getTaxAmount() - $this->getDiscount();
         return $grandTotal;
     }
     public function getSymbolCurrency()

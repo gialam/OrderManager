@@ -31,7 +31,7 @@ $imageRender = $block->getImageRender();
         <div class="actions-toolbar" >
             <div class="primary">
                 <button type="submit"class="update primary" data-action="update-Data"
-                        title="<?php /* @escapeNotVerified */ echo __('Update Data') ?>">
+                        title="<?php /* @escapeNotVerified */ echo __('Update Data') ?>" id="update_data">
                     <span><?php /* @escapeNotVerified */ echo __('Update ') ?></span>
                 </button>
             </div>
@@ -126,8 +126,10 @@ $imageRender = $block->getImageRender();
             <th><?php echo __('SKU') ?></th>
             <th><?php echo __('Price') ?></th>
             <th><?php echo __('Discount') ?></th>
+            <th><?php echo __('Tax') ?></th>
             <th><?php echo __('Select') ?></th>
             <th><?php echo __('Quantity') ?></th>
+
 
         </tr>
         </thead>
@@ -166,6 +168,11 @@ $imageRender = $block->getImageRender();
                 <td data-th="<?php echo $block->escapeHtml(__('Discount')) ?>" class="col discount" name="discount_item"
                     id="discount_item">
                     <?php echo (float)$collection->getDiscount(); ?>
+
+                </td>
+                <td data-th="<?php echo $block->escapeHtml(__('Tax')) ?>" class="col tax" name="tax_item"
+                    id="tax_item">
+                    <?php echo (float)$collection->getTaxPercent(); ?>
 
                 </td>
                 <td data-th="<?php echo $block->escapeHtml(__('Select')) ?>" class="col select" >
@@ -232,6 +239,9 @@ $imageRender = $block->getImageRender();
             $("#show_content").show();
             $("#total").show();
         });
+//        $("#update_data").click(function(){
+//            $("#form-validate").hide();
+//        });
         $("#save_content").click(function(){
             var TableDatas;
             var TableData = new Array();
@@ -243,7 +253,8 @@ $imageRender = $block->getImageRender();
                     , "sku": $(tr).find('td:eq(3)').text()
                     , "price": $(tr).find('td:eq(4)').text()
                     , "discount": $(tr).find('td:eq(5)').text()
-                    , "quantity": $(tr).find('td:eq(7) input').val()
+                    , "tax": $(tr).find('td:eq(6)').text()
+                    , "quantity": $(tr).find('td:eq(8) input').val()
                 }
             });
             TableDatas = JSON.stringify(TableData);

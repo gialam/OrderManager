@@ -10,7 +10,6 @@ use Magenest\OrderManager\Model\OrderItemFactory;
 use Magenest\OrderManager\Model\OrderAddressFactory;
 use Magento\Directory\Model\RegionFactory;
 
-
 /**
  * Class Save
  * @package Magenest\PDFInvoice\Controller\Adminhtml\Invoice
@@ -53,36 +52,55 @@ class Accept extends  \Magento\Backend\App\Action
 //        $this->_logger->addDebug(print_r($orderId,true));
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-        $modelItem      = $this->_objectManager->create('Magento\Sales\Model\Order\Item');
-        $modelAddress   = $this->_objectManager->create('Magento\Sales\Model\Order\Address');
-        $items          = $this->_itemFactory->create()->getCollection()
+        $modelManageOrder = $this->_objectManager->create('Magenest\OrderManager\Model\OrderManage');
+        $modelOrder       = $this->_objectManager->create('Magento\Sales\Model\Order');
+        $modelItem        = $this->_objectManager->create('Magento\Sales\Model\Order\Item');
+        $modelAddress     = $this->_objectManager->create('Magento\Sales\Model\Order\Address');
+
+        $items            = $this->_itemFactory->create()->getCollection()
                             ->addFieldToFilter('order_id',$orderId);
-        $address        = $this->_addressFactory->create()->getCollection()
+        $address          = $this->_addressFactory->create()->getCollection()
                             ->addFieldToFilter('order_id',$orderId);
 
         $i = 0;
             try {
-                if(!empty($items)) {
+                $modelManageOrder->load($orderId,'order_id');
+                $modelManageOrder->setData('status_check','accept');
+                $modelManageOrder->save();
+
+                if(!empty($items->getData())) {
                     foreach ($items as $item) {
-                        $collections   = $modelItem->getCollection();
                         $productId     = $item['productId'];
                         $dataItem = [
+                            'order_id' => $orderId,
+//                            'product_id'=>$item['product_id'],
                             'name'     => $item['name'],
                             'sku'      => $item['sku'],
                             'price'    => $item['price'],
-                            'discount' => $item['discount'],
-                            'quantity' => $item['quantity'],
+                            'discount_percent'       => $item['discount'],
+                            'discount_amount'        => $item['discount'] * $item['quantity'] * $item['price'] / 100,
+                            'base_discount_amount'   => $item['discount'] * $item['quantity'] * $item['price'] / 100,
+                            'discount_invoiced'      => $item['discount'] * $item['quantity'] * $item['price'] / 100,
+                            'base_discount_invoiced' => $item['discount'] * $item['quantity'] * $item['price'] / 100,
+                            'qty_ordered'            => $item['quantity'],
+                            'row_total'              => $item['quantity'] * $item['price'],
+                            'base_row_total'         => $item['quantity'] * $item['price'],
+                            'row_invoiced'           => $item['quantity'] * $item['price'],
+                            'base_row_invoiced'      => $item['quantity'] * $item['price'],
+                            'tax_percent'            => $item['tax'],
+                            'tax_amount'             => $item['tax'] * $item['quantity'] * $item['price'] / 100,
+                            'base_tax_amount'        => $item['percent'] * $item['quantity'] * $item['price'] / 100,
                         ];
-                        $this->_logger->addDebug(print_r($dataItem,true));
-                        $modelItem = $collections->addFieldToFilter('order_id', $orderId)
+//                        $this->_logger->addDebug(print_r($dataItem,true));
+                        $modelItems = $modelItem->getCollection()->addFieldToFilter('order_id', $orderId)
                             ->addFieldToFilter('product_id', $productId)->getFirstItem();
-//                        $modelItem->addData($dataItem);
-//                        $modelItem->save();
+                        $modelItems->addData($dataItem);
+                        $modelItems->save();
                         $i++;
                     }
                 }
 
-                if(!empty($address)) {
+                if(!empty($address->getData())) {
                     foreach ($address as $infoAddress) {
                         $addressId            = $infoAddress['address_id'];
                         $dataAddress = [
@@ -99,7 +117,7 @@ class Accept extends  \Magento\Backend\App\Action
                             'company'         => $infoAddress->getCompany(),
                             'region'          => $this->_regionFactory->create()->load($infoAddress->getRegionId(),'region_id')->getName(),
                         ];
-                        $this->_logger->addDebug(print_r($dataAddress,true));
+//                        $this->_logger->addDebug(print_r($dataAddress,true));
                         $modelAddress = $modelAddress->getCollection()->addFieldToFilter('entity_id',$addressId)->getFirstItem();
                         $modelAddress->addData($dataAddress);
                         $modelAddress->save();
@@ -107,7 +125,55 @@ class Accept extends  \Magento\Backend\App\Action
 
                     }
                 }
+                if(!empty($items->getData())) {
+                    $modelOrder->load($orderId,'entity_id');
 
+                    $costShip = $modelOrder->load($orderId,'entity_id')->getShippingAmount();
+                    $subtotal      = 0;
+                    $totalDiscount = 0;
+                    $totalTax      = 0;
+                    $totalQuantity = 0;
+
+                    foreach ($items as $item) {
+                        $price= $item->getPrice();
+                        $quantity = $item->getQuantity();
+                        $rowTotal = $quantity * $price;
+                        $discount = $item->getDiscount() * $rowTotal /100;
+                        $tax      = $item->getTax() * $rowTotal /100;
+                        $i++;
+                        $totalQuantity += $quantity;
+                        $totalDiscount += $discount;
+                        $totalTax += $tax;
+                        $subtotal += $rowTotal;
+                        $grandtotal = $subtotal + $totalTax - $totalDiscount + $costShip;
+                    }
+
+
+                    $dataOrder = [
+                        'base_grand_total'      => $grandtotal,
+                        'grand_total'           => $grandtotal,
+                        'base_total_invoiced'   => $grandtotal,
+                        'base_total_paid'       => $grandtotal,
+                        'total_invoiced'        => $grandtotal,
+                        'total_paid'            => $grandtotal,
+                        'subtotal'              => $subtotal,
+                        'base_subtotal'         => $subtotal,
+                        'subtotal_invoiced'     => $subtotal,
+                        'base_subtotal_invoice' => $subtotal,
+                        'tax_amount'            => $totalTax,
+                        'tax_invoiced'          => $totalTax,
+                        'base_tax_amount'       => $totalTax,
+                        'base_tax_invoiced'     => $totalTax,
+                        'discount_amount'       => '-'.$totalDiscount,
+                        'base_discount_amount'  => '-'.$totalDiscount,
+                        'discount_invoiced'     => '-'.$totalDiscount,
+                        'base_discount_invoiced'=> '-'.$totalDiscount,
+                        'total_qty_ordered'     => $totalQuantity ,
+
+                    ];
+                    $modelOrder->addData($dataOrder);
+                    $modelOrder->save();
+                }
                 $this->messageManager->addSuccess(__('Information has been accepted .'));
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
                 if ($this->getRequest()->getParam('back')) {
@@ -121,7 +187,6 @@ class Accept extends  \Magento\Backend\App\Action
             } catch (\Exception $e) {
                 $this->messageManager->addError($e, __('Something went wrong while accept data'));
                 $this->_objectManager->get('Psr\Log\LoggerInterface')->critical($e);
-//                $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData($data);
                 return $resultRedirect->setPath('ordermanager/order/edit');
             }
 

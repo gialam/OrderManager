@@ -75,20 +75,22 @@ class Save extends \Magento\Framework\App\Action\Action
                 foreach ($items as $item)
                 {
                     $collections = $model->getCollection();
-                    $productId = $item['productId'];
-                    $name = $item['name'];
-                    $sku =  $item['sku'];
-                    $price =  $item['price'];
-                    $discount =  $item['discount'];
-                    $quantity = $item['quantity'];
+                    $productId   = $item['productId'];
+                    $name        = $item['name'];
+                    $sku         =  $item['sku'];
+                    $price       =  $item['price'];
+//                    $discount    =  $item['discount'];
+                    $quantity    = $item['quantity'];
+                    $tax         = $item['tax'];
                     $dataInfo = [
-                        'order_id' => trim($orderId),
-                        'product_id' => trim($productId),
-                        'name' => trim($name),
-                        'sku' => trim($sku),
-                        'price' => trim($price),
-                        'discount'=> trim($discount),
-                        'quantity' => trim($quantity),
+                        'order_id'  => trim($orderId),
+                        'product_id'=> trim($productId),
+                        'name'      => trim($name),
+                        'sku'       => trim($sku),
+                        'price'     => trim($price),
+                        'discount'  => '0',
+                        'tax'       => $tax,
+                        'quantity'  => trim($quantity),
                     ];
 
                     $model = $collections->addFieldToFilter('order_id', trim($orderId))

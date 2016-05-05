@@ -13,6 +13,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Sales\Model\OrderFactory;
+use Magento\Customer\Model\Session as CustomerSession;
 
 /**
  * Class Save
@@ -28,6 +29,7 @@ class SaveBilling extends \Magento\Framework\App\Action\Action
     protected $_logger;
     protected $_addressFactory;
     protected $_orderFactory;
+    protected $_customerSession;
     /**
      * Save constructor.
      * @param Context $context
@@ -38,9 +40,11 @@ class SaveBilling extends \Magento\Framework\App\Action\Action
         RequestInterface $request,
         LoggerInterface $loggerInterface,
         \Magenest\OrderManager\Model\OrderAddressFactory $addressFactory,
-        OrderFactory $orderFactory
+        OrderFactory $orderFactory,
+        CustomerSession $customerSession
 
     ) {
+        $this->_customerSession = $customerSession;
         $this->_request = $request;
         $this->_logger = $loggerInterface;
         $this->_addressFactory = $addressFactory;
@@ -63,6 +67,7 @@ class SaveBilling extends \Magento\Framework\App\Action\Action
         /**
          * get Data order on sales
          */
+        $customerId = $this->_customerSession->getCustomerId();
         $orderCollection = $this->_orderFactory->create()->load($order);
         $status = $orderCollection->getStatus();
         $firstName  = $orderCollection->getCustomerFirstname();
@@ -77,7 +82,9 @@ class SaveBilling extends \Magento\Framework\App\Action\Action
             $modelOrder->load($order, 'order_id');
             $dataOrder = [
                 'order_id' => $order,
+                'customer_id' =>$customerId,
                 'status' => $status,
+                'status_check'=>'checking',
                 'customer_name' => $firstName . ' ' . $lastName,
                 'customer_email' => $email
             ];
@@ -134,7 +141,7 @@ class SaveBilling extends \Magento\Framework\App\Action\Action
                     }
                     $modelOrder->save();
 
-                    $this->messageManager->addSuccess(__('Billing Address has been sent to checker.'));
+                    $this->messageManager->addSuccess(__('Billing Address has been sent to admin.'));
                     $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
                     if ($this->getRequest()->getParam('back')) {
                         return $resultRedirect->setPath('sales/order/view',

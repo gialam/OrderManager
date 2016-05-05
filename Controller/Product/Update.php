@@ -12,6 +12,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Sales\Model\OrderFactory;
+use Magento\Customer\Model\Session as CustomerSession;
 
 
 /**
@@ -27,6 +28,7 @@ class Update extends \Magento\Framework\App\Action\Action
 
     protected $_logger;
     protected $_orderFactory;
+    protected $_customerSession;
     /**
      * Save constructor.
      * @param Context $context
@@ -39,8 +41,10 @@ class Update extends \Magento\Framework\App\Action\Action
         OrderFactory $orderFactory,
         \Magenest\OrderManager\Model\OrderItemFactory $orderItemFactory,
         \Magenest\OrderManager\Model\OrderAddressFactory $addressFactory,
+        CustomerSession $customerSession,
         array $data = []
     ) {
+        $this->_customerSession = $customerSession;
         $this->_orderItemFactory = $orderItemFactory;
         $this->_request         = $request;
         $this->_logger          = $loggerInterface;
@@ -60,6 +64,7 @@ class Update extends \Magento\Framework\App\Action\Action
         $data = $this->getRequest()->getParams();
         $orderId = $this->getRequest()->getParam('order_id');
 
+        $customerId = $this->_customerSession->getCustomerId();
         $orderCollection = $this->_orderFactory->create()->load($orderId);
         $status = $orderCollection->getStatus();
         $firstName  = $orderCollection->getCustomerFirstname();
@@ -69,24 +74,24 @@ class Update extends \Magento\Framework\App\Action\Action
         /**
          * get data for total
          */
-        $priceShipping = $orderCollection->getBaseShippingAmount();
-        $tax = $orderCollection->getBaseTaxAmount();
-        $collection = $this->_orderItemFactory->create()->getCollection()->addFieldToFilter('order_id',$orderId);
-        $sum = 0;
-        $i = 0;
-        $discounts = 0;
-        foreach($collection as $collections )
-        {
-            $price = $collections->getPrice();
-            $quantity = $collections->getQuantity();
-            $subtotal = $price * $quantity;
-            $discount = $collections->getDiscount();
-            $i++;
-            $sum += $subtotal;
-            $discounts += $discount;
-
-        }
-        $grandTotal = $sum + $priceShipping + $tax + $discounts;
+//        $priceShipping = $orderCollection->getBaseShippingAmount();
+//        $tax = $orderCollection->getBaseTaxAmount();
+//        $collection = $this->_orderItemFactory->create()->getCollection()->addFieldToFilter('order_id',$orderId);
+//        $sum = 0;
+//        $i = 0;
+//        $discounts = 0;
+//        foreach($collection as $collections )
+//        {
+//            $price = $collections->getPrice();
+//            $quantity = $collections->getQuantity();
+//            $subtotal = $price * $quantity;
+//            $discount = $collections->getDiscount();
+//            $i++;
+//            $sum += $subtotal;
+//            $discounts += $discount;
+//
+//        }
+//        $grandTotal = $sum + $priceShipping + $tax + $discounts;
 
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
@@ -101,7 +106,9 @@ class Update extends \Magento\Framework\App\Action\Action
             $model->load($id,'order_id');
             $dataInfo = [
                 'order_id' => $id,
+                'customer_id' =>$customerId,
                 'status' => $status,
+                'status_check'=>'checking',
                 'customer_name' =>  $firstName.' '.$lastName,
                 'customer_email' => $email
             ];
@@ -109,15 +116,15 @@ class Update extends \Magento\Framework\App\Action\Action
             /**
              * save order total
              */
-            $modelGrid = $this->_objectManager->create('Magenest\OrderManager\Model\OrderGrid');
-            $modelGrid->load($orderId,'increment_id');
-            $dataGrid = [
-                'increment_id' => $orderId,
-                'grand_total' => $grandTotal,
-                'subtotal' =>  $sum,
-                'shipping_and_handling' => $priceShipping,
-            ];
-            $modelGrid->addData($dataGrid);
+//            $modelGrid = $this->_objectManager->create('Magenest\OrderManager\Model\OrderGrid');
+//            $modelGrid->load($orderId,'increment_id');
+//            $dataGrid = [
+//                'increment_id' => $orderId,
+//                'grand_total' => $grandTotal,
+//                'subtotal' =>  $sum,
+//                'shipping_and_handling' => $priceShipping,
+//            ];
+//            $modelGrid->addData($dataGrid);
 
             /**
              * save item(s) order
@@ -138,7 +145,8 @@ class Update extends \Magento\Framework\App\Action\Action
                         'name' =>$item->getName() ,
                         'sku' =>$item->getSku() ,
                         'price' =>$item->getPrice() ,
-                        'discount'=>$item->getDiscountAmount() ,
+                        'discount'=>'0',
+                        'tax'    =>$item->getTaxPercent(),
                         'quantity' =>$data['quantity-'.$item->getProductId()] ,
                     ];
 //                    $this->_logger->addDebug(print_r($dataItem,true));
@@ -151,7 +159,7 @@ class Update extends \Magento\Framework\App\Action\Action
 
 
                 $model->save();
-                $modelGrid->save();
+//                $modelGrid->save();
                 $this->messageManager->addSuccess(__('Please wait ulti informations has through !. Email will send to you'));
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
                 if ($this->getRequest()->getParam('back')) {

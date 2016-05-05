@@ -52,6 +52,7 @@ class Update extends \Magento\Backend\App\Action
             {
                 $dataInfo = [
                     'quantity'     => $data['quantity-'.$collections->getProductId()],
+                    'discount'     => $data['discount-'.$collections->getProductId()]
                 ];
 //                $this->_logger->addDebug(print_r($dataInfo,true));
                 $modelSave = $model->getCollection()->addFieldToFilter('order_id',$data['order_id'])

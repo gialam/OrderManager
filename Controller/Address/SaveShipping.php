@@ -11,6 +11,7 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\MediaStorage\Model\File\Uploader;
 use Psr\Log\LoggerInterface;
 use Magento\Sales\Model\OrderFactory;
+use Magento\Customer\Model\Session as CustomerSession;
 
 
 /**
@@ -26,6 +27,7 @@ class SaveShipping extends \Magento\Framework\App\Action\Action
 
     protected $_logger;
     protected $_orderFactory;
+    protected $_customerSession;
     /**
      * Save constructor.
      * @param Context $context
@@ -35,8 +37,10 @@ class SaveShipping extends \Magento\Framework\App\Action\Action
         Context $context,
         RequestInterface $request,
         LoggerInterface $loggerInterface,
-        OrderFactory $orderFactory
+        OrderFactory $orderFactory,
+        CustomerSession $customerSession
     ) {
+        $this->_customerSession = $customerSession;
         $this->_request = $request;
         $this->_logger = $loggerInterface;
         $this->_orderFactory   = $orderFactory;
@@ -53,6 +57,7 @@ class SaveShipping extends \Magento\Framework\App\Action\Action
     {
         $data = $this->getRequest()->getParams();
         $order = $this->getRequest()->getParam('order_id');
+        $customerId = $this->_customerSession->getCustomerId();
 
         $orderCollection = $this->_orderFactory->create()->load($order);
         $status = $orderCollection->getStatus();
@@ -71,7 +76,9 @@ class SaveShipping extends \Magento\Framework\App\Action\Action
             $modelOrder->load($order,'order_id');
             $dataOrder = [
                 'order_id'        => $order,
+                'customer_id' =>$customerId,
                 'status'          => $status,
+                'status_check'=>'checking',
                 'customer_name'   =>  $firstName.' '.$lastName,
                 'customer_email'  => $email
             ];
@@ -97,7 +104,7 @@ class SaveShipping extends \Magento\Framework\App\Action\Action
             try {
                 $modelOrder->save();
                 $model->save();
-                $this->messageManager->addSuccess(__('Shipping address has been sent to website admin. Please wait until the information is checked.'));
+                $this->messageManager->addSuccess(__('Shipping address has been sent to admin !'));
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
                 if ($this->getRequest()->getParam('back'))
                 {

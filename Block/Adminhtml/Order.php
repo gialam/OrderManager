@@ -13,7 +13,6 @@ class Order extends	\Magento\Backend\Block\Widget\Grid\Container
     {
         $this->_blockGroup = 'Magenest_OrderManager';
         $this->_controller = 'adminhtml_order';
-//        $this->removeButton('add');
         parent::_construct();
         $this->removeButton('add');
     }
