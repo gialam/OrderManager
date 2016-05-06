@@ -7,23 +7,26 @@
  */
 ?>
 <?php
-$_symbol = $block->getSymbolCurrency()
+
+$_data = $block->getTotalInfo();
+$symbol = $_data['symbol'];
+$discount = $_data['discount'];
+$subtotal = $_data['subtotal'];
+$shipping = $_data['shipping_handling'];
+$tax = $_data['tax'];
+$grandtotal = $_data['grandtotal'];
 ?>
-<div id="total" align="right">
+
+<div align="right">
     <font size="5" color="red">New Total</font></br>
-    <a1 class="col-Discount">
-        <?php /* @escapeNotVerified */ echo __('Discount             :').$_symbol.' '.(float)$block->getDiscount() ?></br>
-    </a1>
-    <a2 class="col-Subtotal">
-        <?php /* @escapeNotVerified */ echo __('Subtotal             :').$_symbol.' '.(float)$block->getSubtotal() ?></br>
-    </a2>
-    <a3 class="col-Shipping">
-        <?php /* @escapeNotVerified */ echo __('Shipping & Handling  :').$_symbol.' '.(float)$block->getShippingHandling() ?></br>
-    </a3>
-    <a4 class="col-Tax">
-        <?php /* @escapeNotVerified */ echo __('Tax  :').$_symbol.' '.(float)$block->getTaxAmount() ?></br>
-    </a4>
-    <a5 class="col-GrandTotal">
-        <b><?php /* @escapeNotVerified */ echo __('Grand Total        :').$_symbol.' '.(float)$block->getGrandTotal() ?></b></br>
-    </a5>
+    <?php echo  'Discount:'.$symbol.$discount; ?>
+    <br>
+    <?php echo  'Subtotal:'.$symbol.$subtotal; ?>
+    <br>
+    <?php echo  'Shipping & Handling :'.$symbol.$shipping; ?>
+    </br>
+    <?php echo  'Tax:'.$symbol.$tax; ?>
+    <br>
+    <?php echo  'Grand Total:'.$symbol.$grandtotal; ?>
+    </br>
 </div>

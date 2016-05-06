@@ -22,9 +22,12 @@ class MassAddItem extends \Magento\Backend\App\Action
         Context $context,
         \Psr\Log\LoggerInterface $loggerInterface,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productFactory,
-        \Magenest\OrderManager\Model\OrderManageFactory $orderFactory
+        \Magenest\OrderManager\Model\OrderManageFactory $orderFactory,
+        \Magento\CatalogInventory\Api\StockStateInterface $stockFactory
+
     )
     {
+        $this->_stockFactory = $stockFactory;
         $this->_logger         = $loggerInterface;
         $this->_productFactory = $productFactory;
         $this->_orderFactory   = $orderFactory;
@@ -42,6 +45,7 @@ class MassAddItem extends \Magento\Backend\App\Action
         $model = $this->_objectManager->create('Magenest\OrderManager\Model\OrderItem');
         $orderId = $this->getRequest()->getParam('order_id');
         $backId      = $this->_orderFactory->create()->load($orderId,'order_id')->getId();
+//        $quantity = $this->_stockFactory->getStockQty($id,$collections->getStore()->getWebsiteId());
         $i = 0;
         try {
             foreach ($data as $productId)
@@ -57,14 +61,16 @@ class MassAddItem extends \Magento\Backend\App\Action
                         'sku'=>$collections->getSku(),
                         'price'=>$collections->getPrice(),
                         'quantity'=>'1',
-                        'discount'=>$collections->getBaseDiscountAmount(),
+                        'discount'=>$collections->getDiscountAmount(),
                         'thumbnail'=>$collections->getThumbnail(),
                     ];
+
                     $i++;
                     $modelData = $model->getCollection()->addFieldToFilter('product_id',$id)->getFirstItem();
                     $modelData->addData($dataInfo);
                     $modelData->save();
 //                    $this->_logger->addDebug(print_r($dataInfo,true));
+
                 }
             }
 

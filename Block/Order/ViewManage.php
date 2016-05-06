@@ -11,7 +11,7 @@ use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 use Magenest\OrderManager\Model\OrderManageFactory ;
 use Magenest\OrderManager\Model\OrderItemFactory ;
-use Magenest\OrderManager\Model\OrderAddressFactory ;
+use Magenest\OrderManager\Helper\Address ;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Sales\Model\OrderFactory;
@@ -26,7 +26,7 @@ class ViewManage extends Template
 
     protected $_ordermanageFactory;
     protected $_itemFactory;
-    protected $_addressFactory;
+    protected $_addressInfo;
 
     /**
      * @var \Magento\Customer\Model\Session
@@ -54,7 +54,7 @@ class ViewManage extends Template
         Context $context,
         OrderManageFactory $ordermanageFactory,
         OrderItemFactory   $itemFactory,
-        OrderAddressFactory $addressFactory,
+        Address            $addressInfo,
         CustomerSession $customerSession,
         OrderFactory $ordercoreFactory,
         ScopeConfigInterface $scopeConfig,
@@ -64,7 +64,7 @@ class ViewManage extends Template
         $this->_regionFactory    = $regionFactory;
         $this->_ordermanageFactory = $ordermanageFactory;
         $this->_itemFactory        = $itemFactory;
-        $this->_addressFactory     = $addressFactory;
+        $this->_addressInfo     = $addressInfo;
         $this->_ordercoreFactory = $ordercoreFactory;
         $this->_customerSession = $customerSession;
         $this->_scopeConfig = $scopeConfig;
@@ -114,42 +114,15 @@ class ViewManage extends Template
     public function getBillingAddress()
     {
         $orderId = $this->getOrderId();
-        $billing = $this->_addressFactory->create()->getCollection()
-            ->addFieldToFilter('order_id',$orderId)
-            ->addFieldToFilter('address_type','billing');
+        $billing = $this->_addressInfo->getAddress($orderId,'billing');
         return $billing;
     }
 
     public function getShippingAddress()
     {
         $orderId = $this->getOrderId();
-        $billing = $this->_addressFactory->create()->getCollection()
-            ->addFieldToFilter('order_id',$orderId)
-            ->addFieldToFilter('address_type','shipping');
-        return $billing;
-    }
-    public function getBillingRegionName()
-    {
-        $collection = $this->getBillingAddress();
-        foreach($collection as $collections)
-        {
-            $region = $collections->getRegionId();
-
-        }
-        $collection = $this->_regionFactory->create()->load($region,'region_id')->getName();
-        return $collection;
-    }
-
-    public function getShippingRegionName()
-    {
-        $collection = $this->getShippingAddress();
-        foreach($collection as $collections)
-        {
-            $region = $collections->getRegionId();
-
-        }
-        $collection = $this->_regionFactory->create()->load($region,'region_id')->getName();
-        return $collection;
+        $shipping = $this->_addressInfo->getAddress($orderId,'shipping');
+        return $shipping;
     }
     /**
      * @return string

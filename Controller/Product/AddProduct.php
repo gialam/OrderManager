@@ -32,7 +32,7 @@ class AddProduct extends Action
 
     public function execute()
     {
-        $orderId = $this->getRequest()->getParams();
+//        $orderId = $this->getRequest()->getParams();
 
         $this->_view->loadLayout();
         if ($block = $this->_view->getLayout()->getBlock('order.add.product')) {

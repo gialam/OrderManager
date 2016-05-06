@@ -108,7 +108,7 @@ class	Grid	extends	\Magento\Backend\Block\Widget\Grid\Extended
             'header' => __('Product'),
             'index' => 'name'
         ]
-    );
+         );
         $this->addColumn(
             'sku',
             [

@@ -73,11 +73,6 @@ class Edit extends Template
         $country = $this->_collectionDataShipping->getCountryHtmlSelect();
         return $country;
     }
-//    public function getBackUrl()
-//    {
-//        $orderId = $this->getRequest()->getParam('order_id');
-//        return $this->getUrl('sales/order/view'.['order_id' => $orderId->getId()]);
-//    }
     public function getBaseUrl()
     {
         $orderId = $this->getRequest()->getParam('order_id');

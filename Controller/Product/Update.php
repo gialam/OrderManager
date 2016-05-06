@@ -71,28 +71,6 @@ class Update extends \Magento\Framework\App\Action\Action
         $lastName   = $orderCollection->getCustomerLastname();
         $email = $orderCollection->getCustomerEmail();
 
-        /**
-         * get data for total
-         */
-//        $priceShipping = $orderCollection->getBaseShippingAmount();
-//        $tax = $orderCollection->getBaseTaxAmount();
-//        $collection = $this->_orderItemFactory->create()->getCollection()->addFieldToFilter('order_id',$orderId);
-//        $sum = 0;
-//        $i = 0;
-//        $discounts = 0;
-//        foreach($collection as $collections )
-//        {
-//            $price = $collections->getPrice();
-//            $quantity = $collections->getQuantity();
-//            $subtotal = $price * $quantity;
-//            $discount = $collections->getDiscount();
-//            $i++;
-//            $sum += $subtotal;
-//            $discounts += $discount;
-//
-//        }
-//        $grandTotal = $sum + $priceShipping + $tax + $discounts;
-
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
 
@@ -113,18 +91,6 @@ class Update extends \Magento\Framework\App\Action\Action
                 'customer_email' => $email
             ];
             $model->addData($dataInfo);
-            /**
-             * save order total
-             */
-//            $modelGrid = $this->_objectManager->create('Magenest\OrderManager\Model\OrderGrid');
-//            $modelGrid->load($orderId,'increment_id');
-//            $dataGrid = [
-//                'increment_id' => $orderId,
-//                'grand_total' => $grandTotal,
-//                'subtotal' =>  $sum,
-//                'shipping_and_handling' => $priceShipping,
-//            ];
-//            $modelGrid->addData($dataGrid);
 
             /**
              * save item(s) order
@@ -159,11 +125,9 @@ class Update extends \Magento\Framework\App\Action\Action
 
 
                 $model->save();
-//                $modelGrid->save();
                 $this->messageManager->addSuccess(__('Please wait ulti informations has through !. Email will send to you'));
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
                 if ($this->getRequest()->getParam('back')) {
-//                    $orderId = $this->getRequest()->getParam('order_id');
                     return $resultRedirect->setPath('ordermanager/product/view',['order_id'=>$id]);
                 }
                 return $resultRedirect->setPath('ordermanager/product/view',['order_id'=>$id]);

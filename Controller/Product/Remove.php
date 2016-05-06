@@ -52,7 +52,6 @@ class Remove extends \Magento\Framework\App\Action\Action
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $id = $data['item_id'];
-        $this->_logger->addDebug(print_r($id,true));
         if ($data) {
           $model = $this->_objectManager->create('Magenest\OrderManager\Model\OrderItem');
             $modelData =  $model->load($id,'product_id');
