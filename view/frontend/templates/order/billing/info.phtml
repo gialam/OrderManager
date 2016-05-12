@@ -106,11 +106,13 @@ $postcode = $address['postcode'];
                 <?php echo $block->getCountryBillingHtmlSelect() ?>
             </div>
         </div>
+        <?php if(!empty($block->getShippingAddress())): ?>
         <div class="field choice set billing">
             <input type="checkbox" id="primary_billing" name="default_billing"  class="checkbox">
             <label class="label" for="primary_billing"><span><?php /* @escapeNotVerified */
                     echo __('Use as shipping address') ?></span></label>
         </div>
+        <?php endif; ?>
 
     </fieldset>
 

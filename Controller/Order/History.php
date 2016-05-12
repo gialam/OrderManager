@@ -39,7 +39,7 @@ class History extends Action
     {
         /** @var \Magento\Framework\View\Result\Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->set(__('Manage Order'));
+        $resultPage->getConfig()->getTitle()->set(__('Information'));
 
         $block = $resultPage->getLayout()->getBlock('customer.account.link.back');
         if ($block) {

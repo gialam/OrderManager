@@ -5,7 +5,7 @@
  *
  * @category  Magenest
  */
-namespace Magenest\OrderManager\Block\Product\Subtotal;
+namespace Magenest\OrderManager\Block\Product\Search;
 
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
@@ -13,7 +13,7 @@ use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Psr\Log\LoggerInterface;
 
-class Total extends Template
+class SearchBox extends Template
 {
 
     protected $_logger;
@@ -22,7 +22,7 @@ class Total extends Template
      */
 
 
-    protected $_template = 'order/product/subtotal/total.phtml';
+    protected $_template = 'order/product/search/searchbox.phtml';
 
     /**
      * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
@@ -40,10 +40,10 @@ class Total extends Template
         $this->_logger = $loggerInterface;
         parent::__construct($context, $data);
     }
-    public function getTotalInfo()
-    {
-        $orderId = $this->getRequest()->getParam('order_id');
-        $data = $this->_totalInfo->getTotalData($orderId);
-        return $data;
-    }
+//    public function getTotalInfo()
+//    {
+//        $orderId = $this->getRequest()->getParam('order_id');
+//        $data = $this->_totalInfo->getTotalData($orderId);
+//        return $data;
+//    }
 }

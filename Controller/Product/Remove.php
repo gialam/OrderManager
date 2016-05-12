@@ -51,10 +51,11 @@ class Remove extends \Magento\Framework\App\Action\Action
 //        $this->_logger->addDebug(print_r($orderId,true));
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
-        $id = $data['item_id'];
+
         if ($data) {
-          $model = $this->_objectManager->create('Magenest\OrderManager\Model\OrderItem');
-            $modelData =  $model->load($id,'product_id');
+            $id = $data['item_id'];
+            $model = $this->_objectManager->create('Magenest\OrderManager\Model\OrderItem');
+            $modelData =  $model->load($id,'id');
 
             $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData($model->getData());
             try {

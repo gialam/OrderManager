@@ -12,6 +12,7 @@ use Magento\Framework\View\Element\Template\Context;
 use Magenest\OrderManager\Model\OrderManageFactory ;
 use Magenest\OrderManager\Model\OrderItemFactory ;
 use Magenest\OrderManager\Helper\Address ;
+use Magenest\OrderManager\Helper\Total ;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Sales\Model\OrderFactory;
@@ -42,6 +43,7 @@ class ViewManage extends Template
      * @var string
      */
     protected $tickets;
+    protected $_totalInfo;
 
     /**
      * @param Context $context
@@ -58,9 +60,11 @@ class ViewManage extends Template
         CustomerSession $customerSession,
         OrderFactory $ordercoreFactory,
         ScopeConfigInterface $scopeConfig,
+        Total $totalInfo,
         \Magento\Directory\Model\RegionFactory $regionFactory,
         array $data = []
     ) {
+        $this->_totalInfo = $totalInfo;
         $this->_regionFactory    = $regionFactory;
         $this->_ordermanageFactory = $ordermanageFactory;
         $this->_itemFactory        = $itemFactory;
@@ -68,6 +72,7 @@ class ViewManage extends Template
         $this->_ordercoreFactory = $ordercoreFactory;
         $this->_customerSession = $customerSession;
         $this->_scopeConfig = $scopeConfig;
+
         parent::__construct($context, $data);
     }
 
@@ -124,6 +129,12 @@ class ViewManage extends Template
         $shipping = $this->_addressInfo->getAddress($orderId,'shipping');
         return $shipping;
     }
+     public function getTotalInfo()
+     {
+         $orderId = $this->getOrderId();
+         $data = $this->_totalInfo->getTotalData($orderId);
+         return $data;
+     }
     /**
      * @return string
      */

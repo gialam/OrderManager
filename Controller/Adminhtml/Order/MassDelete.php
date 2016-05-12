@@ -45,6 +45,9 @@ class MassDelete extends \Magento\Backend\App\Action
                 foreach ($data as $dataInfo) {
                     $id            = $dataInfo;
                     $order        = $manageOrder->load($id);
+                    $dataManage   =[
+                        'status_check'=>'no accept',
+                    ];
                     $i++;
                     $orderId = $order->getOrderId();
                     if ($orderId) {
@@ -67,7 +70,8 @@ class MassDelete extends \Magento\Backend\App\Action
                         }
 
                     }
-                    $order->delete();
+                    $order->addData($dataManage);
+                    $order->save();
                 }
 
                 $this->messageManager->addSuccess(

@@ -14,7 +14,13 @@ $_dataOrder = $block->getItemsInfo();
 $_billing   = $block->getBillingAddress();
 $_shipping   = $block->getShippingAddress();
 $order_id   = $block->getOrderId();
-//$_total     = $block->getTotalInfo();
+$_total = $block->getTotalInfo();
+$symbol = $_total['symbol'];
+$discount = $_total['discount'];
+$subtotal = $_total['subtotal'];
+$shipping = $_total['shipping_handling'];
+$tax = $_total['tax'];
+$grandtotal = $_total['grandtotal'];
 ?>
 <div class="table-wrapper collection-products" id="product_order">
     <table id="my-collection-products-table" class="data table table-collection-products">
@@ -78,6 +84,20 @@ $order_id   = $block->getOrderId();
 </div>
 </br>
 </br>
+<div align="right">
+    <font size="5" color="red">New Total</font></br>
+    <?php echo  'Discount:'.$symbol.$discount; ?>
+    <br>
+    <?php echo  'Subtotal:'.$symbol.$subtotal; ?>
+    <br>
+    <?php echo  'Shipping & Handling :'.$symbol.$shipping; ?>
+    </br>
+    <?php echo  'Tax:'.$symbol.$tax; ?>
+    <br>
+    <?php echo  'Grand Total:'.$symbol.$grandtotal; ?>
+    </br>
+</div>
+
 <?php if (!empty($_billing) || !empty($_shipping)):?>
 <table class="data-table" data-role="flex-table">
     <div>

@@ -46,7 +46,9 @@ $symbol = $block->getSymbolCurrency();
         <tbody>
         <?php $i = 0 ?>
         <?php foreach ($_dataOrder as $_data ) { ?>
-            <?php $productId = $_data->getProductId() ?>
+            <?php $productId = $_data->getProductId();
+                    $id = $_data->getId();
+            ?>
             <tr>
                 <td data-th="<?php echo $block->escapeHtml(__('Product')) ?>" class="col-product">
                     <?php echo  $_data->getName(); ?>
@@ -62,7 +64,8 @@ $symbol = $block->getSymbolCurrency();
                 <td data-th="<?php echo $block->escapeHtml(__('Qty')) ?>" class="col-qty">
                     <div class="control">
                         <input type="number" name="quantity-<?php echo $productId  ?>" id="quantity" class="input-number-quantity"
-                               style="width: 50px;" value="<?php echo $_data->getQuantity(); ?>">
+                               style="width: 50px;" value="<?php echo $_data->getQuantity(); ?>" min="1"
+                        max="<?php echo $block->getStockProduct()->getStockQty($productId); ?>">
                     </div>
 
                 </td>
@@ -85,7 +88,7 @@ $symbol = $block->getSymbolCurrency();
 
                 </td>
                 <td class="col-actions last">
-                    <a href="<?php echo $block->getRemoveProduct($productId) ?>" class="action view">
+                    <a href="<?php echo $block->getRemoveProduct($id) ?>" class="action view">
                         <span><?php /* @escapeNotVerified */ echo __('Remove') ?></span>
                     </a>
                 </td>

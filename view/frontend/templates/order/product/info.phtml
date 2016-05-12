@@ -17,7 +17,9 @@ $symbol = $_items->getOrderCurrency()->getCurrencySymbol();
 $_dataOrder = $block->getNewProduct();
 $imageRender = $block->getImageRender();
 ?>
-
+<div>
+    <?php echo $block->getSearchBox() ?>
+</div>
 <button id="show_content" style="float: right" class="primary">Add Products</button>
 
 <div class="table-wrapper collection-products" id="product_order">
@@ -31,10 +33,16 @@ $imageRender = $block->getImageRender();
         <div class="actions-toolbar" >
             <div class="primary">
                 <button type="submit"class="update primary" data-action="update-Data"
-                        title="<?php /* @escapeNotVerified */ echo __('Update Data') ?>" id="update_data">
-                    <span><?php /* @escapeNotVerified */ echo __('Update ') ?></span>
+                        title="<?php /* @escapeNotVerified */ echo __('Update Data') ?>" id="update_data_continue">
+                    <span><?php /* @escapeNotVerified */ echo __('Update') ?></span>
                 </button>
             </div>
+<!--            <div class="secondary">-->
+<!--                <button type="submit"class="update secondary" data-action="update-Data"-->
+<!--                        title="--><?php ///* @escapeNotVerified */ echo __('Update Data') ?><!--" id="update_data">-->
+<!--                    <span>--><?php ///* @escapeNotVerified */ echo __('Update') ?><!--</span>-->
+<!--                </button>-->
+<!--            </div>-->
         </div>
 
         <?php /** Table old product */ ?>
@@ -58,7 +66,8 @@ $imageRender = $block->getImageRender();
             <?php $i = 0 ?>
 
             <?php foreach ($_items->getAllItems()as $_item ) { ?>
-                <?php $id_product = $_item->getProductId() ?>
+                <?php $productId = $_item->getProductId();
+                ?>
                 <tr>
                     <td data-th="<?php echo $block->escapeHtml(__('Product')) ?>" class="col-product">
                         <?php echo  $_item->getName(); ?>
@@ -74,8 +83,9 @@ $imageRender = $block->getImageRender();
                     <td data-th="<?php echo $block->escapeHtml(__('Qty')) ?>" class="col-qty">
                         <!--                    --><?php //echo $_item->getQtyOrdered(); ?>
                         <div class="control">
-                            <input type="number" name="quantity-<?php echo $id_product?>" id="quantity" class="input-number-quantity"
-                                   style="width: 50px;" value="<?php echo $_item->getQtyOrdered(); ?>">
+                            <input type="number" name="quantity-<?php echo $productId ?>" id="quantity" class="input-number-quantity"
+                                   style="width: 50px;" value="<?php echo $_item->getQtyOrdered(); ?>" min="<?php echo $_item->getQtyOrdered() ?>"
+                            max="<?php echo  $block->getStockProduct()->getStockQty($productId); ?>">
                         </div>
 
                     </td>
@@ -96,6 +106,10 @@ $imageRender = $block->getImageRender();
             <?php } ?>
             </tbody>
         </table>
+<!--        <p id="demo">-->
+<!--            --><?php //echo $block->getStockProduct()->getStockQty($productId); ?>
+<!--        </p>-->
+
     </form>
 
     <?php /** Table new product */ ?>
@@ -176,13 +190,13 @@ $imageRender = $block->getImageRender();
 
                 </td>
                 <td data-th="<?php echo $block->escapeHtml(__('Select')) ?>" class="col select" >
-                    <input type="checkbox" name="select" style="width: 30px;height: 30px "/>
+                    <input type="checkbox" name="select_product" id="select_product" style="width: 30px;height: 30px "/>
                 </td>
                 <td data-th="<?php echo $block->escapeHtml(__('Quantity')) ?>" class="col quantity" name="quantity_item"
                     id="quantity_item">
-                    <div class="control">
-                        <input type="number" name="quantity" id="quantity" class="input-number-quantity"
-                               style="width: 50px;">
+                    <div class="control"  >
+                        <input type="number" name="quantity" id="quantity_check" class="input-number-quantity"
+                               style="width: 50px;" min="1" max="<?php echo  $block->getStockProduct()->getStockQty( $collection->getId()); ?>">
                     </div>
 
                 </td>
@@ -243,29 +257,29 @@ $imageRender = $block->getImageRender();
 //            $("#form-validate").hide();
 //        });
         $("#save_content").click(function(){
-            var TableDatas;
-            var TableData = new Array();
-            $('#sampleTbl tr').has('input[type="checkbox"]:checked').each(function (row, tr) {
-                TableData[row] = {
-                    "productId": $(tr).find('td:eq(0)').text()
-                    , "orderId": $(tr).find('td:eq(1)').text()
-                    , "name": $(tr).find('td:eq(2)').text()
-                    , "sku": $(tr).find('td:eq(3)').text()
-                    , "price": $(tr).find('td:eq(4)').text()
-                    , "discount": $(tr).find('td:eq(5)').text()
-                    , "tax": $(tr).find('td:eq(6)').text()
-                    , "quantity": $(tr).find('td:eq(8) input').val()
-                }
-            });
-            TableDatas = JSON.stringify(TableData);
+                var TableDatas;
+                var TableData = new Array();
+                $('#sampleTbl tr').has('input[type="checkbox"]:checked').each(function (row, tr) {
+                    TableData[row] = {
+                        "productId": $(tr).find('td:eq(0)').text()
+                        , "orderId": $(tr).find('td:eq(1)').text()
+                        , "name": $(tr).find('td:eq(2)').text()
+                        , "sku": $(tr).find('td:eq(3)').text()
+                        , "price": $(tr).find('td:eq(4)').text()
+                        , "discount": $(tr).find('td:eq(5)').text()
+                        , "tax": $(tr).find('td:eq(6)').text()
+                        , "quantity": $(tr).find('td:eq(8) input').val()
+                    }
+                });
+                TableDatas = JSON.stringify(TableData);
 //                $('#tbTableValues').val('JSON array: \n' + TableDatas.replace(/},/g, "},\n"));
-            $.ajax({
-                type: "POST",
-                url: '<?php echo $block->getNewAddProductUrl(); ?>',
-                data: "pTableData=" + TableDatas,
-                success: function(){
-                }
-            });
+                $.ajax({
+                    type: "POST",
+                    url: '<?php echo $block->getNewAddProductUrl(); ?>',
+                    data: "pTableData=" + TableDatas,
+                    success: function(){
+                    }
+                });
         });
     });
     var pager = new Pager('sampleTbl', 10);
@@ -330,6 +344,7 @@ $imageRender = $block->getImageRender();
             element.innerHTML = pagerHtml;
         }
     }
+
 </script>
 <style media="screen" type="text/css">
     .pg-normal {

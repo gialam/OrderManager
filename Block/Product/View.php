@@ -35,6 +35,8 @@ class View extends Template
      * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
     protected $productFactory;
+    protected $_stockFactory;
+    protected $_defaultToolbarBlock = 'Magenest\OrderManager\Block\Product\Toolbar';
     /**
      * Edit constructor.
      * @param Context $context
@@ -50,10 +52,12 @@ class View extends Template
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productFactory,
         \Magento\Sales\Model\OrderFactory $itemCollectionFactory,
         \Magenest\OrderManager\Model\OrderItemFactory $orderItemFactory,
+        \Magento\CatalogInventory\Api\StockStateInterface $stockFactory,
         StoreManagerInterface $storemanager,
         array $data =[]
     )
     {
+        $this->_stockFactory = $stockFactory;
         $this->_storeManager = $storemanager;
         $this->_customerSession = $customerSession;
         $this->_scopeConfig = $scopeConfig;
@@ -145,5 +149,16 @@ class View extends Template
         $newProduct = $this->getLayout()->createBlock('Magenest\OrderManager\Block\Product\NewProduct');
         return $newProduct->toHtml();
     }
+    public function getStockProduct()
+    {
+        $quantity = $this->_stockFactory;
+        return $quantity;
+    }
+    public function getSearchBox()
+    {
+        $searchBox = $this->getLayout()->createBlock('Magenest\OrderManager\Block\Product\Search\SearchBox');
+        return $searchBox->toHtml();
+    }
+
 
 }

@@ -3,7 +3,7 @@
     <menu>
         <add
                 id="Magenest_OrderManager::ordermanager"
-                title="Manage OrderManager "
+                title="Manage Order"
                 module="Magenest_OrderManager"
                 sortOrder="60"
                 parent="Magento_Sales::sales"

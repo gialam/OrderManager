@@ -32,6 +32,7 @@ class Edit extends Template
     protected $itemCollection;
     protected $_collectionDataShipping;
     protected $_editData;
+    protected $_addressFactory;
     /**
      * Edit constructor.
      * @param Context $context
@@ -45,6 +46,7 @@ class Edit extends Template
         CustomerSession $customerSession,
         ScopeConfigInterface $scopeConfig,
         \Magento\Sales\Model\OrderFactory $itemCollectionFactory,
+        \Magenest\OrderManager\Model\OrderAddressFactory $addressFactory,
         Data  $collectionDataShipping,
         editData $editData,
         array $data =[]
@@ -55,6 +57,7 @@ class Edit extends Template
         $this->itemCollection        = $itemCollectionFactory;
         $this->_collectionDataShipping = $collectionDataShipping;
         $this->_editData = $editData;
+        $this->_addressFactory  = $addressFactory;
         parent::__construct($context, $data);
     }
     protected function _construct()
@@ -67,6 +70,13 @@ class Edit extends Template
         $orderId = $this->getRequest()->getParam('order_id');
         $collectionItem = $this->itemCollection->create()->load($orderId);
         return $collectionItem;
+    }
+    public function getShippingAddress()
+    {
+        $orderId = $this->getRequest()->getParam('order_id');
+        $data = $this->_addressFactory->create()->getCollection()->addFieldToFilter('order_id',$orderId)
+            ->addFieldToFilter('address_type','shipping')->getData();
+        return $data;
     }
     public function getCountryBillingHtmlSelect()
     {

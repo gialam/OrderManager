@@ -6,6 +6,7 @@ namespace Magenest\OrderManager\Block\Adminhtml\Address\Billing;
 
 use Psr\Log\LoggerInterface;
 use Magento\Directory\Block\Data;
+use Magento\Customer\Block\Address\Edit as editData;
 
 class Edit extends \Magento\Backend\Block\Template
 {
@@ -14,6 +15,7 @@ class Edit extends \Magento\Backend\Block\Template
     protected $_addressFactory;
     protected $_dataBilling;
     protected $_regionFactory;
+    protected $_editData;
 
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
@@ -22,6 +24,7 @@ class Edit extends \Magento\Backend\Block\Template
         \Magenest\OrderManager\Model\OrderManageFactory $manageFactory,
         \Magento\Directory\Model\RegionFactory $regionFactory,
         Data  $collectionDataShipping,
+        editData $editData,
         array $data =[] )
     {
         $this->_logger         = $loggerInterface;
@@ -29,6 +32,7 @@ class Edit extends \Magento\Backend\Block\Template
         $this->_manageFactory  = $manageFactory;
         $this->_dataBilling = $collectionDataShipping;
         $this->_regionFactory = $regionFactory;
+        $this->_editData = $editData;
         parent::__construct($context, $data);
     }
     protected function _construct()
@@ -69,6 +73,11 @@ class Edit extends \Magento\Backend\Block\Template
         $orderId = $this->getRequest()->getParam('order_id');
         return $this->getUrl('ordermanager/address/updateBilling',['order_id'=>$orderId]);
     }
+//    public function getRegionBilling()
+//    {
+//        $region = $this->_editData->getRegion();
+//        return $region;
+//    }
     public function getBackUrl()
     {
         $orderId = $this->getRequest()->getParam('order_id');

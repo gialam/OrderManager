@@ -25,7 +25,8 @@
 ?>
 <?php /** @var $block \Magenest\OrderManager\Block\Order\History */ ?>
 
-<?php $_orders = $block->getOrderInfo();?>
+<?php $_orders = $block->getOrderInfo();
+?>
 <?php echo $block->getChildHtml('info');?>
 <?php if ($_orders && count($_orders)): ?>
     <div class="table-wrapper ordermanager-orders-history">
@@ -54,11 +55,13 @@
                     <td data-th="<?php echo $block->escapeHtml(__('Censorship')) ?>" class="col check">
                         <?php /* @escapeNotVerified */ echo $_order->getStatusCheck() ?>
                     </td>
+                    <?php if($_order->getStatusCheck() != 'no accept'): ?>
                     <td data-th="<?php echo /* @escapeNotVerified */ $block->escapeHtml(__('Action')) ?>" class="col action">
                         <a href="<?php /* @escapeNotVerified */ echo $block->getViewUrl($orderId) ?>" class="action view">
                             <span><?php /* @escapeNotVerified */ echo __('View') ?></span>
                         </a>
                     </td>
+                    <?php endif;?>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -66,10 +69,11 @@
     </div>
     <?php echo count($_orders).' Item(s)' ?>
     <?php if ($block->getPagerHtml()): ?>
-        <div class="tickets-events-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); ?></div>
+        <div class="ordermanager-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); ?></div>
     <?php endif ?>
 <?php else: ?>
     <div class="message info empty"><span><?php /* @escapeNotVerified */ echo __('You have placed no any order edit.'); ?></span></div>
 <?php endif ?>
+
 
 

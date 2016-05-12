@@ -36,7 +36,11 @@ class	Grid	extends	\Magento\Backend\Block\Widget\Grid\Extended
      */
     protected	function	_prepareCollection()
     {
-        $this->setCollection($this->_orderCollection);
+        $collection =[
+            'checking',
+            'accept'
+        ];
+        $this->setCollection($this->_orderCollection->addFieldToFilter('status_check',$collection));
         return	parent::_prepareCollection();
     }
 

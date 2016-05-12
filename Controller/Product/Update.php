@@ -128,9 +128,9 @@ class Update extends \Magento\Framework\App\Action\Action
                 $this->messageManager->addSuccess(__('Please wait ulti informations has through !. Email will send to you'));
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData(false);
                 if ($this->getRequest()->getParam('back')) {
-                    return $resultRedirect->setPath('ordermanager/product/view',['order_id'=>$id]);
+                    return $resultRedirect->setPath('sales/order/view',['order_id'=>$id]);
                 }
-                return $resultRedirect->setPath('ordermanager/product/view',['order_id'=>$id]);
+                return $resultRedirect->setPath('sales/order/view',['order_id'=>$id]);
             } catch (\LocalizedException $e) {
                 $this->messageManager->addError($e->getMessage());
 
@@ -138,7 +138,7 @@ class Update extends \Magento\Framework\App\Action\Action
                 $this->messageManager->addError($e, __('Something went wrong while update order'));
                 $this->_objectManager->get('Psr\Log\LoggerInterface')->critical($e);
                 $this->_objectManager->get('Magento\Backend\Model\Session')->setPageData($data);
-                return $resultRedirect->setPath('ordermanager/product/view',['order_id'=>$id]);
+                return $resultRedirect->setPath('sales/order/view',['order_id'=>$id]);
             }
         }
         return $resultRedirect->setPath('ordermanager/product/view',['order_id'=>$orderId]);

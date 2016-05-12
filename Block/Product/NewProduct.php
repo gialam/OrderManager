@@ -34,6 +34,7 @@ class NewProduct extends Template
      * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
     protected $productFactory;
+    protected $_stockFactory;
 
     /**
      * NewProduct constructor.
@@ -47,10 +48,12 @@ class NewProduct extends Template
         Template\Context $context,
         \Magento\Sales\Model\OrderFactory $itemCollectionFactory,
         \Magenest\OrderManager\Model\OrderItemFactory $orderItemFactory,
+        \Magento\CatalogInventory\Api\StockStateInterface $stockFactory,
         StoreManagerInterface $storemanager,
         array $data =[]
     )
     {
+        $this->_stockFactory = $stockFactory;
         $this->_storeManager         = $storemanager;
         $this->itemCollection        = $itemCollectionFactory;
         $this->_orderItemFactory     = $orderItemFactory;
@@ -72,15 +75,19 @@ class NewProduct extends Template
         return $data;
     }
 
-    public function getRemoveProduct($productId)
+    public function getRemoveProduct($id)
     {
         $orderId   = $this->getRequest()->getParam('order_id');
-        return $this->getUrl('ordermanager/product/remove',['item_id'=>$productId,'order_id'=>$orderId]);
+        return $this->getUrl('ordermanager/product/remove',['item_id'=>$id,'order_id'=>$orderId]);
     }
     public function getUpdateQuantityUrl()
     {
         $orderId   = $this->getRequest()->getParam('order_id');
         return $this->getUrl('ordermanager/product/updateItem',['order_id'=>$orderId]);
     }
-
+    public function getStockProduct()
+    {
+        $quantity = $this->_stockFactory;
+        return $quantity;
+    }
 }

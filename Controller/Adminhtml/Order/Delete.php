@@ -44,14 +44,11 @@ class Delete extends \Magento\Backend\App\Action
              */
             $modelManage = $this->_objectManager->create('Magenest\OrderManager\Model\OrderManage');
             $modelManage->load($orderId,'order_id');
-            $modelManage->setData($orderId,'order_id');
+            $dataManage = [
+              'status_check'=>'no accept',
+            ];
+            $modelManage->addData($dataManage);
 
-            /**
-             *delete grid
-             */
-            $modelGrid = $this->_objectManager->create('Magenest\OrderManager\Model\OrderGrid');
-            $modelGrid->load($orderId,'increment_id');
-            $modelGrid->setData($orderId,'order_id');
             /**
              * delete item(s)
              */
@@ -68,13 +65,14 @@ class Delete extends \Magento\Backend\App\Action
             $totals = 0;
             $i = 0;
             try {
-                $modelManage->delete();
-                $modelGrid->delete();
+                $modelManage->save();
+
                 foreach ($modelItem as $items) {
                     $items->setData($orderId,'order_id');
                     $items->delete();
                     $totals++;
                 }
+
                 foreach ($modelAddress as $addresss) {
                     $addresss->setData($orderId,'order_id');
                     $addresss->delete();
